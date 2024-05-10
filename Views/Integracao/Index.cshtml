@@ -1,0 +1,106 @@
+﻿@model IntegracaoViewModel
+@{
+    ViewBag.Title = "Nova Integração";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-2">Configuração de Integração</h1>
+    <ul class="nav nav-tabs" id="myTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="config-tab" data-bs-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="true">Configuração</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#options" role="tab" aria-controls="options" aria-selected="false">Opções</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="config" role="tabpanel" aria-labelledby="integration-tab">
+            <form id="integrationForm" asp-controller="Integracao" asp-action="Gravar">
+                <input asp-for="IdIntegracao" type="hidden"/>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <span class="d-inline-block">
+                            <label for="nomeIntegracao" class="form-label">Nome da Integração</label> <i class="mx-1 fs-5 icon ion-information-circled" title="Insira um nome válido (sem espaços ou caracteres especiais, exceto '-' e '_')."></i>
+                        </span>
+                        <input type="text" asp-for="NomeIntegracao" class="form-control" name="nomeIntegracao" required="required" pattern="[a-zA-Z0-9_\-]+" autocomplete="off"/>
+                        <p class="fs-6 fst-italic">https://hub-integracao.paas.cassi.com.br/v1/<label class="nome-integracao fw-bold">@{Model == null || string.IsNullOrEmpty(Model.NomeIntegracao)?"nome_integracao":Model.NomeIntegracao}</label>/{operacao}</p>
+                    </div>
+                    <div class="col-6">
+                        <label for="tipoIntegracao" class="form-label">Tipo de Integração</label>
+                        <select class="form-select" asp-for="TipoIntegracao" name="tipoIntegracao" required>
+                            <option value="">Selecione...</option>
+                            <option value="rest">API para API</option>
+                            <option value="soap">API para SOAP</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-2 mb-3">
+                    <div class="col-12">
+                        <label class="form-label">Opções de Integração</label>
+                        <div class="form-check">
+                            <label class="form-check-label" for="opcaoHealthcheck">
+                                <input class="form-check-input" type="checkbox" asp-for="OpcaoHealthcheck" name="opcaoHealthcheck" id="opcaoHealthcheck"> Healthcheck
+                            </label>
+                            <div class="fs-6 fst-italic">Verificar a saúde da API exposta na integração.</div>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="opcaoLogService">
+                                <input class="form-check-input" type="checkbox" asp-for="OpcaoLogService" name="opcaoLogService" id="opcaoLogService"> Log Service
+                            </label>
+                            <div class="fs-6 fst-italic">Registrar os logs de transações da integração.</div>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="opcaoAuthorization">
+                                <input class="form-check-input" type="checkbox" asp-for="OpcaoAuthorization" name="opcaoAuthorization" id="opcaoAuthorization"> Authorization
+                            </label>
+                            <div class="fs-6 fst-italic">Configurar autenticação de entrada da integração.</div>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label" for="opcaoSwagger">
+                                <input class="form-check-input" type="checkbox" asp-for="OpcaoSwagger" name="opcaoSwagger" id="opcaoSwagger"> Swagger
+                            </label>
+                            <div class="fs-6 fst-italic">Documentar a API exposta na integração para apresentação do Swagger.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-secondary">Continuar <i class="icon ion-arrow-right-c"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane" id="options" role="tabpanel" aria-labelledby="integration-tab">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+    $(document).ready(function(){
+        
+        $("input[name='nomeIntegracao']").on('keyup', function (event) {
+            let nome = $(this).val();
+            if (nome === '') 
+                nome = '{nome_integracao}';
+            $("label.nome-integracao").text(nome);
+        });
+        
+        $('#myTabs a').on('click', function (event) {
+            event.preventDefault();
+            $(this).tab('show');
+        });
+        $('#integrationForm').submit(function(event){
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            $(this).addClass('was-validated');
+        });
+    });
+  </script>
+
+}

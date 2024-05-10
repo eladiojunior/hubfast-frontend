@@ -1,7 +1,10 @@
+using hubfast_frontend.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IIntegracaoService, IntegracaoService>();
 
 var app = builder.Build();
 
