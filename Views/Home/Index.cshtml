@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<IntegracaoModel>
+@{
     ViewData["Title"] = "Home";
 }
 <div>
@@ -7,5 +8,8 @@
     <p>O HUB Fast é uma plataforma inovadora projetada para simplificar e acelerar a integração entre APIs REST e SOAP. Com uma interface intuitiva e configurável, permite aos desenvolvedores conectar facilmente diferentes serviços e sistemas, eliminando a complexidade de lidar com protocolos divergentes.</p>
     <p>Por meio do HUB Fast, os usuários podem configurar e gerenciar endpoints, mapear solicitações e respostas, e implementar autenticação e autorização, tudo em um único ambiente centralizado. Isso possibilita a criação de proxies personalizados que facilitam a comunicação entre sistemas heterogêneos, otimizando o desenvolvimento e reduzindo o tempo de implementação.</p>
     <p>Com sua abordagem ágil e flexível, o HUB Fast oferece uma solução abrangente para desafios de integração de API, permitindo que as equipes de desenvolvimento concentrem seus esforços na criação de valor agregado para seus aplicativos e serviços.</p>
-    <a class="btn btn-primary mt-5" asp-action="Index" asp-controller="Integracao">Nova Integração</a>
+    @{
+        await Html.RenderPartialAsync("_ListaIntegracoesPartial", Model);
+    }
+    <a class="btn btn-primary mt-2 mb-2" asp-action="Novo" asp-controller="Integracao">Nova Integração</a>
 </div>

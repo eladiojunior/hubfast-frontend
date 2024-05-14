@@ -11,7 +11,7 @@ public class ServicesHelper
     {
         if (string.IsNullOrEmpty(nomeIntegracao))
             return false;
-        var regex = new Regex("[a-zA-Z0-9_-]+");
+        var regex = new Regex("^[a-zA-Z0-9_-]*$");
         return regex.IsMatch(nomeIntegracao);
     }
 }

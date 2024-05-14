@@ -1,56 +1,45 @@
-﻿@model IntegracaoViewModel
+﻿@model EdicaoIntegracaoViewModel;
 @{
-    ViewBag.Title = "Nova Integração";
+    ViewBag.Title = "Configurar Integração";
     Layout = "_Layout";
 }
-
-<div class="container mt-5">
-    <h1 class="mb-2">Configuração de Integração</h1>
+<div class="container">
+    <h3 class="mb-2">Configuração de Integração</h3>
     <ul class="nav nav-tabs" id="tabsConfiguracao" role="tablist">
         <li class="nav-item">
             <a class="nav-link active" id="config-tab" data-bs-toggle="tab" href="#tab_integracao" role="tab" aria-controls="tab_integracao" aria-selected="true">Configuração</a>
         </li>
-        @if (Model != null && !string.IsNullOrEmpty(Model.IdIntegracao))
+        <li class="nav-item">
+            <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_operacoes" role="tab" aria-controls="tab_operacoes" aria-selected="false">Operações</a>
+        </li>
+        @if (Model.OpcaoHealthcheck)
         {
             <li class="nav-item">
-                <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_operacoes" role="tab" aria-controls="tab_operacoes" aria-selected="false">Operações</a>
+                <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_healthcheck" role="tab" aria-controls="tab_healthcheck" aria-selected="false">Healthcheck</a>
             </li>
-            @if (Model.OpcaoHealthcheck)
-            {
-                <li class="nav-item">
-                    <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_healthcheck" role="tab" aria-controls="tab_healthcheck" aria-selected="false">Healthcheck</a>
-                </li>
-            }
-            @if (Model.OpcaoLogService)
-            {
-                <li class="nav-item">
-                    <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_logservice" role="tab" aria-controls="tab_logservice" aria-selected="false">Log Service</a>
-                </li>
-            }
-            @if (Model.OpcaoAuthorization)
-            {
-
-                <li class="nav-item">
-                    <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_authorization" role="tab" aria-controls="tab_authorization" aria-selected="false">Authorization</a>
-                </li>
-            }
-            @if (Model.OpcaoSwagger)
-            {
-                <li class="nav-item">
-                    <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_swagger" role="tab" aria-controls="tab_swagger" aria-selected="false">Swagger</a>
-                </li>
-            }
         }
-        else
+        @if (Model.OpcaoLogService)
         {
             <li class="nav-item">
-                <a class="nav-link disabled" id="options-tab" data-bs-toggle="tab" href="#tab_operacoes" role="tab" aria-disabled="true" aria-controls="tab_operacoes">Operações</a>
+                <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_logservice" role="tab" aria-controls="tab_logservice" aria-selected="false">Log Service</a>
+            </li>
+        }
+        @if (Model.OpcaoAuthorization)
+        {
+            <li class="nav-item">
+                <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_authorization" role="tab" aria-controls="tab_authorization" aria-selected="false">Authorization</a>
+            </li>
+        }
+        @if (Model.OpcaoSwagger)
+        {
+            <li class="nav-item">
+                <a class="nav-link" id="options-tab" data-bs-toggle="tab" href="#tab_swagger" role="tab" aria-controls="tab_swagger" aria-selected="false">Swagger</a>
             </li>
         }
     </ul>
     <div class="tab-content" id="tabsContent">
         <div class="tab-pane fade show active" id="tab_integracao" role="tabpanel" aria-labelledby="integration-tab">
-            <form id="integrationForm" asp-controller="Integracao" asp-action="Gravar">
+            <form id="integrationForm" asp-controller="Integracao" asp-action="Editar">
                 <input asp-for="IdIntegracao" type="hidden"/>
                 <div class="row mt-3">
                     <div class="col-6">
@@ -58,7 +47,7 @@
                             <label for="nomeIntegracao" class="form-label">Nome da Integração</label> <i class="mx-1 fs-5 icon ion-information-circled" title="Insira um nome válido (sem espaços ou caracteres especiais, exceto '-' e '_')."></i>
                         </span>
                         <input type="text" asp-for="NomeIntegracao" class="form-control" name="nomeIntegracao" required="required" pattern="[a-zA-Z0-9_\-]+" autocomplete="off"/>
-                        <p class="fs-6 fst-italic">https://hub-integracao.paas.cassi.com.br/v1/<label class="nome-integracao fw-bold">@(Model == null || string.IsNullOrEmpty(Model.NomeIntegracao) ? "nome_integracao" : Model.NomeIntegracao)</label>/{operacao}</p>
+                        <p class="fs-6 fst-italic">https://hub-integracao.paas.cassi.com.br/v@(Model.VersaoIntegracao)/<label class="nome-integracao fw-bold">@(string.IsNullOrEmpty(Model.NomeIntegracao) ? "nome_integracao" : Model.NomeIntegracao)</label>/{operacao}</p>
                     </div>
                     <div class="col-6">
                         <label for="tipoIntegracao" class="form-label">Tipo de Integração</label>
@@ -70,7 +59,11 @@
                     </div>
                 </div>
                 <div class="row mt-2 mb-3">
-                    <div class="col-12">
+                    <div class="col-6">
+                        <label for="descricaoIntegracao" class="form-label">Descrição da Integração</label>
+                        <textarea class="form-control" asp-for="DescricaoIntegracao" name="descricaoIntegracao" id="descricaoIntegracao" rows="8"></textarea>
+                    </div>
+                    <div class="col-6">
                         <label class="form-label">Opções de Integração</label>
                         <div class="form-check">
                             <label class="form-check-label" for="opcaoHealthcheck">
@@ -110,9 +103,33 @@
         <div class="tab-pane" id="tab_operacoes" role="tabpanel" aria-labelledby="integration-tab">
             <div class="div-operacoes">Carregar operações...</div>
         </div>
+        @if (Model.OpcaoHealthcheck)
+        {
+            <div class="tab-pane" id="tab_healthcheck" role="tabpanel" aria-labelledby="integration-tab">
+                <div class="div-healthcheck">Carregar healthcheck...</div>
+            </div>
+        }
+        @if (Model.OpcaoLogService)
+        {
+            <div class="tab-pane" id="tab_logservice" role="tabpanel" aria-labelledby="integration-tab">
+                <div class="div-logservice">Carregar log service...</div>
+            </div>
+        }
+        @if (Model.OpcaoAuthorization)
+        {
+            <div class="tab-pane" id="tab_authorization" role="tabpanel" aria-labelledby="integration-tab">
+                <div class="div-authorization">Carregar authorization...</div>
+            </div>
+        }
+        @if (Model.OpcaoSwagger)
+        {
+            <div class="tab-pane" id="tab_swagger" role="tabpanel" aria-labelledby="integration-tab">
+                <div class="div-swagger">Carregar swagger...</div>
+            </div>
+        }
     </div>
 </div>
 
 @section Scripts {
-    <script src="@Url.Content("~/js/view-integracao-index.js")"></script>
+    <script src="@Url.Content("~/js/view-integracao-editar.js")"></script>
 }

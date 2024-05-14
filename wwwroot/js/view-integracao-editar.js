@@ -1,4 +1,4 @@
-﻿Integracao = {
+﻿EditarIntegracao = {
 
     InitConfiguracao: function () {
         $("input[name='nomeIntegracao']").on('keyup', function (event) {
@@ -21,5 +21,5 @@
     },
 }
 $(function () {
-    Integracao.InitConfiguracao();
+    EditarIntegracao.InitConfiguracao();
 });
