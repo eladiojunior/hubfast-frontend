@@ -1,0 +1,54 @@
+﻿@using hubfast_frontend.Services.Models.Enums
+@using hubfast_frontend.Services.Helpers
+@model OperacoesIntegracaoViewModel
+
+<div class="container">
+    <form id="attributeForm">
+        <div class="row mt-2">
+            <div class="col-12">
+                <label for="nomeOperacao" class="form-label">Nome da Operação</label>
+                <div class="input-group mb-3">
+                    <select class="form-select col-2" id="inputGroupSelect02">
+                        <option selected>Método...</option>
+                        @foreach (var tipoMetodo in EnumsHelper.ListarEnums<TipoMetodoRestEnum>())
+                        {
+                            <option value="@tipoMetodo.CodigoEnum()">@tipoMetodo.DescricaoEnum()</option>
+                        }
+                    </select>
+                    <span class="input-group-text col-4" id="basic-addon3">https://hub-integracao.paas.cassi.com.br/v@(Model.VersaoIntegracao)/@(Model.NomeIntegracao)/</span>
+                    <input type="text" class="form-control col-6" id="nomeOperacao" name="nomeOperacao" pattern="[a-zA-Z0-9_\-]+" required="required" autocomplete="off" aria-describedby="basic-addon3">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <label for="attributeName" class="form-label">Nome Atributo</label>
+                <input type="text" class="form-control" id="nomeAtributo" name="nomeAtributo" required/>
+            </div>
+            <div class="col-4">
+                <label for="attributeType" class="form-label">Tipo</label>
+                <select class="form-select" id="tipoAtributo" name="tipoAtributo" required>
+                    <option value="">Selecione o tipo</option>
+                    <option value="alfanumerico">Alfanumérico</option>
+                    <option value="numerico">Numérico</option>
+                    <option value="objeto">Objeto</option>
+                </select>
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-secondary mt-3 adicionar-atributo">Adicionar</button>
+            </div>
+        </div>
+    </form>
+    <h3 class="mt-2">Atributos da Operação</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody id="listaAtributos">
+        </tbody>
+    </table>
+</div>

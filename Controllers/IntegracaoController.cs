@@ -7,15 +7,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace hubfast_frontend.Controllers;
 
-public class IntegracaoController : Controller
+public class IntegracaoController : GenericController
 {
     private readonly ILogger<IntegracaoController> _logger;
-    private IIntegracaoService _service;
-
-    public IntegracaoController(ILogger<IntegracaoController> logger, IIntegracaoService service)
+    private readonly IIntegracaoService _integracaoService;
+    private readonly IViewRenderService _viewRenderService;
+    
+    public IntegracaoController(ILogger<IntegracaoController> logger, IIntegracaoService integracaoService, IViewRenderService viewRenderService)
     {
         _logger = logger;
-        _service = service;
+        _integracaoService = integracaoService;
+        _viewRenderService = viewRenderService;
     }
 
     public IActionResult Novo()
@@ -40,7 +42,7 @@ public class IntegracaoController : Controller
             model.OpcaoLogService = viewModel.OpcaoLogService;
             model.OpcaoSwagger = viewModel.OpcaoSwagger;
 
-            model = _service.gravarIntegracao(model);
+            model = _integracaoService.gravarIntegracao(model);
 
             return CarregarEditar(model.IdIntegracao);
         }
@@ -68,7 +70,7 @@ public class IntegracaoController : Controller
                 return RedirectToAction("Index", "Home");
             }
 
-            var model = _service.obterIntegracaoPorId(idIntegracao);
+            var model = _integracaoService.obterIntegracaoPorId(idIntegracao);
             if (model == null)
             {
                 _logger.LogInformation("Não encontramos nenhuma integração com esse identificador.");
@@ -121,7 +123,7 @@ public class IntegracaoController : Controller
             model.OpcaoLogService = viewModel.OpcaoLogService;
             model.OpcaoSwagger = viewModel.OpcaoSwagger;
 
-            _service.gravarIntegracao(model);
+            _integracaoService.gravarIntegracao(model);
         }
         catch (NegocioException erro_negocio)
         {
@@ -142,8 +144,46 @@ public class IntegracaoController : Controller
         if (string.IsNullOrEmpty(idIntegracao))
             return RedirectToAction("Index", "Home");
 
-        _service.removerIntegracao(idIntegracao);
+        _integracaoService.removerIntegracao(idIntegracao);
 
         return RedirectToAction("Index", "Home");
+    }
+
+    //GET: Integracao/ListarOperacoesIntegracao
+    [HttpGet]
+    public JsonResult ListarOperacoesIntegracao(string idIntegracao)
+    {
+        try
+        {
+
+            var integracao = _integracaoService.obterIntegracaoPorId(idIntegracao);
+            if (integracao == null)
+                return JsonResultErro($"Não idenfitificamos a integração com o ID: {idIntegracao}.");
+
+            var model = new OperacoesIntegracaoViewModel();
+            model.IdIntegracao = integracao.IdIntegracao;
+            model.NomeIntegracao = integracao.NomeIntegracao;
+            model.VersaoIntegracao = integracao.VersaoIntegracao;
+            model.OperacoesIntegracao = new List<OperacaoIntegracaoModel>();
+
+            var listaOperacoes = _integracaoService.listarOperacaoIntegracao(idIntegracao);
+            if (listaOperacoes != null && listaOperacoes.Count != 0)
+                model.OperacoesIntegracao = listaOperacoes;
+
+            var viewString = _viewRenderService.RenderToStringAsync("Integracao/_OperacoesIntegracaoPartial", model).Result;
+
+            return JsonResultSucesso(viewString, "Sucesso.");
+
+        }
+        catch (NegocioException erro_negocio)
+        {
+            return JsonResultErro(erro_negocio.Message);
+        }
+        catch (Exception erro)
+        {
+            var mensagem = $"Erro ao listar as operações da integração [{idIntegracao}].";
+            _logger.LogError(erro, mensagem);
+            return JsonResultErro(mensagem);
+        }
     }
 }

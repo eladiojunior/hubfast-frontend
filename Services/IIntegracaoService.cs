@@ -9,4 +9,7 @@ public interface IIntegracaoService
     IntegracaoModel? obterIntegracaoPorId(string idIntegracao);
     IntegracaoModel? obterIntegracaoPorNome(string nomeIntegracao);
     void removerIntegracao(string idIntegracao);
+    List<OperacaoIntegracaoModel> listarOperacaoIntegracao(string idIntegracao);
+    OperacaoIntegracaoModel gravarOperacaoIntegracao(string idIntegracao, OperacaoIntegracaoModel model);
+    void removerOperacaoIntegracao(string idIntegracao, string idOperacao);
 }

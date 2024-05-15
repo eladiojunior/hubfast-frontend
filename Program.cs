@@ -1,12 +1,17 @@
 using hubfast_frontend.Services;
+using hubfast_frontend.Views.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IIntegracaoService, IntegracaoService>();
+builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
 
 var app = builder.Build();
+
+// Inicializar a classe estática com IConfiguration
+ConfigurationHelper.Initialize(app.Services.GetRequiredService<IConfiguration>());
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
