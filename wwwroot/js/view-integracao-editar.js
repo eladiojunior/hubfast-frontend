@@ -40,6 +40,7 @@
                     return;
                 }
                 $("div.operacoes").html(result.model);
+                EditarOperacoes.InitConfiguracao();
             }, error: function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log(errorThrown);
             }

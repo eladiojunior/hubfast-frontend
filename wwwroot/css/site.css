@@ -61,3 +61,10 @@ body {
 .validation-summary-errors ul li {
     list-style: none;
 }
+
+.icon {
+    color: #c4bebe;
+}
+.mover-atributo:hover {
+    cursor: move;
+}
