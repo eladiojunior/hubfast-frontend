@@ -1,58 +1,94 @@
-﻿EditarOperacoes = {
-
+﻿let editorJsonRequest = null;
+let editorJsonResponse = null;
+EditarOperacoes = {
+    
     InitConfiguracao: function () {
-
-        $('.adicionar-atributo').click(function() {
-            const atributosIndex = $('#container-atributos').children().length;
-            $('#container-atributos').append(`
-                <div class="field-group" data-index="${atributosIndex}">
-                    <div class="row g-4">
-                        <div class="col-auto mt-5">
-                            <a href="#" class="mover-atributo fs-2" title="Mover atributo"><i class="icon ion-grid"></i></a>
-                        </div>
-                        <div class="col-8">
-                            <input type="text" class="form-control" id="nomeAtributo${atributosIndex}" name="nomeAtributo" required/>
-                        </div>
-                        <div class="col-3">
-                            <select class="form-select" id="tipoAtributo${atributosIndex}" name="tipoAtributo" required>
-                                <option value="alfanumerico">Texto</option>
-                                <option value="numerico">Número</option>
-                                <option value="objeto">Objeto</option>
-                            </select>
-                        </div>
-                        <div class="col-auto mt-5">
-                            <a href="#" class="remover-atributo fs-2" data-index="${atributosIndex}" title="Remover atributo"><i class="icon ion-trash-a"></i></a>
-                        </div>
-                    </div>
-                </div>
-            `);
-            EditarOperacoes.InitRemoverEMoverAtributos();
-            
+        EditarOperacoes.InitEditorJson();
+        EditarOperacoes.InitGravarOperacao();
+        $(".nova-operacao").click(function () {
+            EditarOperacoes.NovaOperacao();
         });
     },
-    InitRemoverEMoverAtributos: function () {
-        $('.remover-atributo').click(function() {
-            var index = $(this).data('index');
-            console.log(index);
-        });
+    
+    InitEditorJson: function () {
         
-        $('#container-atributos').sortable({
-            update: function(event, ui) {
-                updateIndices();
+        const options = {
+            mode: 'code',
+        };
+
+        const editorRequest = document.getElementById("jsoneditor_request");
+        editorJsonRequest = new JSONEditor(editorRequest, options);
+        let json_request = $("input[name='JsonRequestOperacao']").val();
+        if (json_request === '')
+            json_request = {
+                "atributo-texto": "texto",
+                "atributo-numero": 0,
+                "atributo-objeto": {
+                    "atributo-texto": "texto",
+                    "atributo-numero": 0
+                }
+            };
+        EditarOperacoes.CarregarEditorRequestJson(json_request);
+
+        const editorResponse = document.getElementById("jsoneditor_response");
+        editorJsonResponse = new JSONEditor(editorResponse, options);
+        let json_response = $("input[name='JsonResponseOperacao']").val();
+        if (json_response === '')
+            json_response = {
+                "data": {},
+                "mensagens": []
+            };
+        EditarOperacoes.CarregarEditorResponseJson(json_response);
+        
+    },
+    
+    CarregarEditorRequestJson: function (json) {
+        if (!editorJsonRequest)
+            return;
+        editorJsonRequest.set(json);
+    },
+    
+    CarregarEditorResponseJson: function (json) {
+        if (!editorJsonResponse)
+            return;
+        editorJsonResponse.set(json);
+    },
+
+    InitGravarOperacao: function () {
+        $('#form-operacao').submit(function(event){
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
             }
-        });
-        function updateIndices() {
-            $('#container-atributos .field-group').each(function(index) {
-                $(this).attr('data-index', index);
-                $(this).find('.form-control').each(function() {
-                    var id = $(this).attr('id');
-                    var newId = id.split('_')[0] + '_' + index;
-                    $(this).attr('id', newId);
-                });
+            $(this).addClass('was-validated');
+            //Carregar JSON nos inputs
+            const jsonRequest = editorJsonRequest.get();
+            console.log(jsonRequest);
+            const jsonResponse = editorJsonResponse.get();
+            console.log(jsonResponse);
+            $("input[name='JsonRequestOperacao']").val(JSON.stringify(jsonRequest));
+            $("input[name='JsonResponseOperacao']").val(JSON.stringify(jsonResponse));
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: _contexto + "Integracao/GravarOperacao",
+                dataType: "json",
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result.hasErro) {
+                        Global.ExibirMensagem(result.erros, true);
+                        return;
+                    }
+                    Global.ExibirMensagem(result.mensagem);
+                }, error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    Global.ExibirMensagem(errorThrown, true);
+                }
             });
-        }        
+            return false;
+        });
+    },
+    NovaOperacao: function () {
+        console.log("Nova operacao.");
     },
 }
-$(function () {
-    EditarOperacoes.InitConfiguracao();
-});

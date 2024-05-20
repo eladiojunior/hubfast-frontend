@@ -86,6 +86,14 @@ public class IntegracaoService: IIntegracaoService
             throw new NegocioException($"Nenhuma informação da operação informada.");
         if (string.IsNullOrEmpty(model.NomeOperacao)) 
             throw new NegocioException($"Nome da operação não informado.");
+        if (string.IsNullOrEmpty(model.JsonRequest)) 
+            throw new NegocioException($"Informações da requisição de entrada (Request) não informado.");
+        if (model.AtributosRequest == null || model.AtributosRequest.Count == 0) 
+            throw new NegocioException($"Atributos da requisição de entrada (Request) não carregados do Json.");
+        if (string.IsNullOrEmpty(model.JsonResponse)) 
+            throw new NegocioException($"Informações da requisição de saída (Response) não informado.");
+        if (model.AtributosResponse == null || model.AtributosResponse.Count == 0) 
+            throw new NegocioException($"Atributos da requisição de saída (Response) não carregados do Json.");
         
         var listaOperacoes = listarOperacaoIntegracao(idIntegracao);
         if (listaOperacoes != null)

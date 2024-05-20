@@ -3,7 +3,9 @@ using hubfast_frontend.Models;
 using hubfast_frontend.Services;
 using hubfast_frontend.Services.Helpers;
 using hubfast_frontend.Services.Models;
+using hubfast_frontend.Services.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace hubfast_frontend.Controllers;
 
@@ -44,7 +46,8 @@ public class IntegracaoController : GenericController
 
             model = _integracaoService.gravarIntegracao(model);
 
-            return CarregarEditar(model.IdIntegracao);
+            return RedirectToAction("CarregarEditar", "Integracao", new { Idintegracao = model.IdIntegracao});
+        
         }
         catch (NegocioException erro_negocio)
         {
@@ -164,11 +167,11 @@ public class IntegracaoController : GenericController
             model.IdIntegracao = integracao.IdIntegracao;
             model.NomeIntegracao = integracao.NomeIntegracao;
             model.VersaoIntegracao = integracao.VersaoIntegracao;
-            model.OperacoesIntegracao = new List<OperacaoIntegracaoModel>();
+            model.Operacoes = new List<OperacaoIntegracaoModel>();
 
             var listaOperacoes = _integracaoService.listarOperacaoIntegracao(idIntegracao);
             if (listaOperacoes != null && listaOperacoes.Count != 0)
-                model.OperacoesIntegracao = listaOperacoes;
+                model.Operacoes = listaOperacoes;
 
             var viewString = _viewRenderService.RenderToStringAsync("Integracao/_OperacoesIntegracaoPartial", model).Result;
 
@@ -186,4 +189,109 @@ public class IntegracaoController : GenericController
             return JsonResultErro(mensagem);
         }
     }
+
+    //POST: Integracao/GravarOperacao
+    [HttpPost]
+    public JsonResult GravarOperacao(OperacaoIntegracaoViewModel viewModel)
+    {
+        
+        if (!ModelState.IsValid)
+            return JsonResultErro(ModelState);
+        
+        try
+        {
+
+            var model = new OperacaoIntegracaoModel();
+            model.IdOperacao = viewModel.IdOperacao;
+            model.TipoMetodoOperacao = EnumsHelper.EnumPorCodigo<TipoMetodoRestEnum>(viewModel.CodigoMetodoOperacao);
+            model.NomeOperacao = viewModel.NomeOperacao;
+            model.JsonRequest = viewModel.JsonRequestOperacao;
+            model.AtributosRequest = ConvertJsonToAtributos(viewModel.JsonRequestOperacao);
+            model.JsonResponse = viewModel.JsonResponseOperacao;
+            model.AtributosResponse = ConvertJsonToAtributos(viewModel.JsonResponseOperacao);
+            
+            var operacao = _integracaoService.gravarOperacaoIntegracao(viewModel.IdIntegracao, model);
+            if (operacao == null)
+                return JsonResultErro($"Operação não foi gravada.");
+
+            viewModel.IdOperacao = operacao.IdOperacao;
+            viewModel.NomeOperacao = operacao.NomeOperacao;
+            viewModel.JsonRequestOperacao = operacao.JsonRequest;
+            viewModel.JsonResponseOperacao = operacao.JsonResponse;
+
+            return ListarOperacoesIntegracao(viewModel.IdIntegracao);
+
+        }
+        catch (NegocioException erro_negocio)
+        {
+            return JsonResultErro(erro_negocio.Message);
+        }
+        catch (Exception erro)
+        {
+            var mensagem = $"Erro ao gravar a operação da integração [{viewModel.IdIntegracao}].";
+            _logger.LogError(erro, mensagem);
+            return JsonResultErro(mensagem);
+        }
+    }
+
+    private List<AtributoOperacaoModel> ConvertJsonToAtributos(string json)
+    {
+        var listAtributos = new List<AtributoOperacaoModel>();
+        if (string.IsNullOrEmpty(json))
+            throw new NegocioException("Json não informado, não é possível converter em objeto de atributos da operação.");
+        
+        var jsonDictionary = new Dictionary<string, object>();
+        try
+        {
+            jsonDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+        }
+        catch (Exception erro)
+        {
+            _logger.LogError(erro, "ConverteJsonToAtributos");
+            throw new NegocioException("Não foi possível desserializar o json, verifique se ele não está inválido.");
+        }
+
+        // Iterar sobre os pares chave-valor do JSON
+        foreach (var kvp in jsonDictionary)
+        {
+            var atributo = new AtributoOperacaoModel();
+
+            atributo.NomeAtributo = kvp.Key;
+            switch (kvp.Value)
+            {
+                // Verificar se o valor é um número ou texto
+                case int or long or float or double or decimal:
+                    atributo.TipoAtributo = TipoAtributoEnum.Numero;
+                    atributo.AtributosObjeto = null;
+                    atributo.ConteudoAtributo = kvp.Value.ToString();
+                    break;
+                case string:
+                    atributo.TipoAtributo = TipoAtributoEnum.Texto;
+                    atributo.AtributosObjeto = null;
+                    atributo.ConteudoAtributo = kvp.Value.ToString();
+                    break;
+                case JArray array:
+                    atributo.TipoAtributo = TipoAtributoEnum.Array;
+                    foreach (var item in array)
+                    {
+                        atributo.AtributosObjeto = ConvertJsonToAtributos(array.ToString());
+                        break; //Não precisa pegar mais que um objeto;
+                    }
+                    atributo.AtributosObjeto = null;
+                    atributo.ConteudoAtributo = null;
+                    break;
+                case JObject:
+                    atributo.TipoAtributo = TipoAtributoEnum.Objeto;
+                    atributo.AtributosObjeto = ConvertJsonToAtributos(kvp.Value.ToString());
+                    atributo.ConteudoAtributo = null;
+                    break;
+            }
+            
+            listAtributos.Add(atributo);
+        }
+
+        return listAtributos;
+        
+    }
+    
 }

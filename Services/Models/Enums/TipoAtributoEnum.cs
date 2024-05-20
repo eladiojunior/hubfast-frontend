@@ -4,10 +4,12 @@ namespace hubfast_frontend.Services.Models.Enums;
 
 public enum TipoAtributoEnum
 {
-    [Description("Alfanumerico")]
-    Alfanumerico=1,
-    [Description("Numerico")]
-    Numerico=2,
+    [Description("Texto")]
+    Texto=1,
+    [Description("Número")]
+    Numero=2,
+    [Description("Array")]
+    Array=3,
     [Description("Objeto")]
-    Objeto=3
+    Objeto=4
 }

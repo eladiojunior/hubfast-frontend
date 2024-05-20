@@ -1,6 +1,8 @@
 ﻿Global = {
     ExibirMensagem: function (msg, hasErro) {
         if (!msg || msg === "") return;
+        console.log(msg);
+        /*
         var tituloMsg = (hasErro?"Erro":"Informação");
         var classTitulo = (hasErro?"warning":"success");
         var classIconMsg = (hasErro?"fs-5 icon ion-close-circled text-danger":"fs-5 icon ion-information-circled")
@@ -16,5 +18,6 @@
                 </div>
             </div>
         `);
+        */
     },
 };

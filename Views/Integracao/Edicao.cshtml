@@ -3,6 +3,9 @@
     ViewBag.Title = "Configurar Integração";
     Layout = "_Layout";
 }
+@section Styles {
+    <link rel="stylesheet" href="~/lib/jsoneditor/dist/css/jsoneditor.min.css"/>
+}
 <div class="container">
     <h3 class="mb-2">Configuração de Integração</h3>
     <ul class="nav nav-tabs" id="tabsConfiguracao" role="tablist">
@@ -131,6 +134,7 @@
 </div>
 
 @section Scripts {
+    <script src="@Url.Content("~/lib/jsoneditor/dist/js/jsoneditor.min.js")"></script>
     <script src="@Url.Content("~/js/view-integracao-editar.js")"></script>
     <script src="@Url.Content("~/js/view-integracao-operacoes.js")"></script>
 }

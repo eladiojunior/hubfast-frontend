@@ -8,5 +8,7 @@ public class OperacaoIntegracaoModel
     public string NomeOperacao { get; set; }
     public TipoMetodoRestEnum TipoMetodoOperacao { get; set; }
     public List<AtributoOperacaoModel> AtributosRequest { get; set; }
+    public string JsonRequest { get; set; }
     public List<AtributoOperacaoModel> AtributosResponse { get; set; }
+    public string JsonResponse { get; set; }
 }
