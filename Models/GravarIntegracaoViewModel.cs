@@ -9,7 +9,7 @@ public class GravarIntegracaoViewModel
     public string NomeIntegracao { get; set; }
     
     [Required(ErrorMessage = "Tipo de integração não informado")]  
-    public string TipoIntegracao { get; set; }
+    public int CodigoTipoIntegracao { get; set; }
     
     [Required(ErrorMessage = "Descrição da integração não informada")]
     [MaxLength(500, ErrorMessage = "Descrição da integração não pode ser maior que 500 caracteres")]

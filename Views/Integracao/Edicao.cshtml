@@ -1,4 +1,6 @@
 ﻿@using hubfast_frontend.Views.Helpers
+@using hubfast_frontend.Services.Helpers
+@using hubfast_frontend.Services.Models.Enums
 @model EdicaoIntegracaoViewModel;
 @{
     ViewBag.Title = "Configurar Integração";
@@ -55,10 +57,11 @@
                     </div>
                     <div class="col-6">
                         <label for="tipoIntegracao" class="form-label">Tipo de Integração</label>
-                        <select class="form-select" asp-for="TipoIntegracao" name="tipoIntegracao" required>
-                            <option value="rest">API para API</option>
-                            <option value="soap">API para SOAP</option>
-                            <option value="sqc">API para SQC</option>
+                        <select class="form-select" asp-for="CodigoTipoIntegracao" name="tipoIntegracao" required>
+                            @foreach (var tipo in EnumsHelper.ListarEnums<TipoIntegracaoEnum>())
+                            {
+                                <option value="@tipo.CodigoEnum()">@tipo.DescricaoEnum()</option>
+                            }
                         </select>
                     </div>
                 </div>

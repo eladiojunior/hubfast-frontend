@@ -38,7 +38,7 @@ public class IntegracaoController : GenericController
             //Carregar model para gravação...
             var model = new IntegracaoModel();
             model.NomeIntegracao = viewModel.NomeIntegracao;
-            model.TipoIntegracao = viewModel.TipoIntegracao;
+            model.TipoIntegracao = EnumsHelper.EnumPorCodigo<TipoIntegracaoEnum>(viewModel.CodigoTipoIntegracao);
             model.DescricaoIntegracao = viewModel.DescricaoIntegracao;
             model.OpcaoHealthcheck = viewModel.OpcaoHealthcheck;
             model.OpcaoAuthorization = viewModel.OpcaoAuthorization;
@@ -83,7 +83,7 @@ public class IntegracaoController : GenericController
             var viewModel = new EdicaoIntegracaoViewModel();
             viewModel.IdIntegracao = model.IdIntegracao;
             viewModel.NomeIntegracao = model.NomeIntegracao;
-            viewModel.TipoIntegracao = model.TipoIntegracao;
+            viewModel.CodigoTipoIntegracao = model.TipoIntegracao.CodigoEnum();
             viewModel.DescricaoIntegracao = model.DescricaoIntegracao;
             viewModel.OpcaoHealthcheck = model.OpcaoHealthcheck;
             viewModel.OpcaoAuthorization = model.OpcaoAuthorization;
@@ -119,7 +119,7 @@ public class IntegracaoController : GenericController
             var model = new IntegracaoModel();
             model.IdIntegracao = viewModel.IdIntegracao;
             model.NomeIntegracao = viewModel.NomeIntegracao;
-            model.TipoIntegracao = viewModel.TipoIntegracao;
+            model.TipoIntegracao = EnumsHelper.EnumPorCodigo<TipoIntegracaoEnum>(viewModel.CodigoTipoIntegracao);
             model.DescricaoIntegracao = viewModel.DescricaoIntegracao;
             model.OpcaoHealthcheck = viewModel.OpcaoHealthcheck;
             model.OpcaoAuthorization = viewModel.OpcaoAuthorization;
