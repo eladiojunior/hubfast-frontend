@@ -14,8 +14,9 @@ public class IntegracaoController : GenericController
     private readonly ILogger<IntegracaoController> _logger;
     private readonly IIntegracaoService _integracaoService;
     private readonly IViewRenderService _viewRenderService;
-    
-    public IntegracaoController(ILogger<IntegracaoController> logger, IIntegracaoService integracaoService, IViewRenderService viewRenderService)
+
+    public IntegracaoController(ILogger<IntegracaoController> logger, IIntegracaoService integracaoService,
+        IViewRenderService viewRenderService)
     {
         _logger = logger;
         _integracaoService = integracaoService;
@@ -46,8 +47,7 @@ public class IntegracaoController : GenericController
 
             model = _integracaoService.gravarIntegracao(model);
 
-            return RedirectToAction("CarregarEditar", "Integracao", new { Idintegracao = model.IdIntegracao});
-        
+            return RedirectToAction("CarregarEditar", "Integracao", new { Idintegracao = model.IdIntegracao });
         }
         catch (NegocioException erro_negocio)
         {
@@ -158,10 +158,9 @@ public class IntegracaoController : GenericController
     {
         try
         {
-
             var integracao = _integracaoService.obterIntegracaoPorId(idIntegracao);
             if (integracao == null)
-                return JsonResultErro($"Não idenfitificamos a integração com o ID: {idIntegracao}.");
+                return JsonResultErro($"Não identificamos a integração com o ID: {idIntegracao}.");
 
             var model = new OperacoesIntegracaoViewModel();
             model.IdIntegracao = integracao.IdIntegracao;
@@ -173,10 +172,10 @@ public class IntegracaoController : GenericController
             if (listaOperacoes != null && listaOperacoes.Count != 0)
                 model.Operacoes = listaOperacoes;
 
-            var viewString = _viewRenderService.RenderToStringAsync("Integracao/_OperacoesIntegracaoPartial", model).Result;
+            var viewString = _viewRenderService.RenderToStringAsync("Integracao/_OperacoesIntegracaoPartial", model)
+                .Result;
 
             return JsonResultSucesso(viewString, "Sucesso.");
-
         }
         catch (NegocioException erro_negocio)
         {
@@ -194,13 +193,11 @@ public class IntegracaoController : GenericController
     [HttpPost]
     public JsonResult GravarOperacao(OperacaoIntegracaoViewModel viewModel)
     {
-        
         if (!ModelState.IsValid)
             return JsonResultErro(ModelState);
-        
+
         try
         {
-
             var model = new OperacaoIntegracaoModel();
             model.IdOperacao = viewModel.IdOperacao;
             model.TipoMetodoOperacao = EnumsHelper.EnumPorCodigo<TipoMetodoRestEnum>(viewModel.CodigoMetodoOperacao);
@@ -209,7 +206,7 @@ public class IntegracaoController : GenericController
             model.AtributosRequest = ConvertJsonToAtributos(viewModel.JsonRequestOperacao);
             model.JsonResponse = viewModel.JsonResponseOperacao;
             model.AtributosResponse = ConvertJsonToAtributos(viewModel.JsonResponseOperacao);
-            
+
             var operacao = _integracaoService.gravarOperacaoIntegracao(viewModel.IdIntegracao, model);
             if (operacao == null)
                 return JsonResultErro($"Operação não foi gravada.");
@@ -220,7 +217,6 @@ public class IntegracaoController : GenericController
             viewModel.JsonResponseOperacao = operacao.JsonResponse;
 
             return ListarOperacoesIntegracao(viewModel.IdIntegracao);
-
         }
         catch (NegocioException erro_negocio)
         {
@@ -238,8 +234,9 @@ public class IntegracaoController : GenericController
     {
         var listAtributos = new List<AtributoOperacaoModel>();
         if (string.IsNullOrEmpty(json))
-            throw new NegocioException("Json não informado, não é possível converter em objeto de atributos da operação.");
-        
+            throw new NegocioException(
+                "Json não informado, não é possível converter em objeto de atributos da operação.");
+
         var jsonDictionary = new Dictionary<string, object>();
         try
         {
@@ -277,6 +274,7 @@ public class IntegracaoController : GenericController
                         atributo.AtributosObjeto = ConvertJsonToAtributos(array.ToString());
                         break; //Não precisa pegar mais que um objeto;
                     }
+
                     atributo.AtributosObjeto = null;
                     atributo.ConteudoAtributo = null;
                     break;
@@ -286,12 +284,84 @@ public class IntegracaoController : GenericController
                     atributo.ConteudoAtributo = null;
                     break;
             }
-            
+
             listAtributos.Add(atributo);
         }
 
         return listAtributos;
-        
     }
-    
+
+    //GET: Integracao/CarregarEdicaoOperacao
+    [HttpGet]
+    public JsonResult CarregarEdicaoOperacao(string idIntegracao, string idOperacao)
+    {
+        try
+        {
+            var operacao = _integracaoService.obterOperacaoPorId(idOperacao);
+            if (operacao == null)
+                return JsonResultErro($"Não identificamos a operação da integração com o ID: {idOperacao}.");
+
+            var integracao = _integracaoService.obterIntegracaoPorId(idIntegracao);
+            if (integracao == null)
+                return JsonResultErro($"Não identificamos a integração com o ID: {idIntegracao}.");
+
+            var model = new OperacoesIntegracaoViewModel();
+            model.IdIntegracao = integracao.IdIntegracao;
+            model.NomeIntegracao = integracao.NomeIntegracao;
+            model.VersaoIntegracao = integracao.VersaoIntegracao;
+
+            model.IdOperacao = operacao.IdOperacao;
+            model.CodigoMetodoOperacao = operacao.TipoMetodoOperacao.CodigoEnum();
+            model.NomeOperacao = operacao.NomeOperacao;
+            model.JsonRequestOperacao = operacao.JsonRequest;
+            model.JsonResponseOperacao = operacao.JsonResponse;
+
+            model.Operacoes = new List<OperacaoIntegracaoModel>();
+
+            var listaOperacoes = _integracaoService.listarOperacaoIntegracao(idIntegracao);
+            if (listaOperacoes != null && listaOperacoes.Count != 0)
+                model.Operacoes = listaOperacoes;
+
+            var viewString = _viewRenderService.RenderToStringAsync("Integracao/_OperacoesIntegracaoPartial", model)
+                .Result;
+
+            return JsonResultSucesso(viewString, "Informações da operação carrega com sucesso.");
+        }
+        catch (NegocioException erro_negocio)
+        {
+            return JsonResultErro(erro_negocio.Message);
+        }
+        catch (Exception erro)
+        {
+            var mensagem = $"Erro ao carregar operação da integração [{idOperacao}].";
+            _logger.LogError(erro, mensagem);
+            return JsonResultErro(mensagem);
+        }
+    }
+
+    //POST: Integracao/RemoverOperacao
+    [HttpPost]
+    public JsonResult RemoverOperacao(string idOperacao)
+    {
+        try
+        {
+            var operacao = _integracaoService.obterOperacaoPorId(idOperacao);
+            if (operacao == null)
+                return JsonResultErro($"Não identificamos a operação da integração com o ID: {idOperacao}.");
+
+            _integracaoService.removerOperacao(idOperacao);
+
+            return JsonResultSucesso("Operação da integração removida com sucesso.");
+        }
+        catch (NegocioException erro_negocio)
+        {
+            return JsonResultErro(erro_negocio.Message);
+        }
+        catch (Exception erro)
+        {
+            var mensagem = $"Erro ao remover operação da integração [{idOperacao}].";
+            _logger.LogError(erro, mensagem);
+            return JsonResultErro(mensagem);
+        }
+    }
 }

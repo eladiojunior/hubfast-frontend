@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using hubfast_frontend.Views.Helpers
 @model GravarIntegracaoViewModel;
 @{
     ViewBag.Title = "Configurar Integração";
@@ -24,14 +25,14 @@
                             <label for="nomeIntegracao" class="form-label">Nome da Integração</label> <i class="mx-1 fs-5 icon ion-information-circled" title="Insira um nome válido (sem espaços ou caracteres especiais, exceto '-' e '_')."></i>
                         </span>
                         <input type="text" asp-for="NomeIntegracao" class="form-control" name="nomeIntegracao" pattern="[a-zA-Z0-9_\-]+" required="required" autocomplete="off"/>
-                        <p class="fs-6 fst-italic">https://hub-integracao.paas.cassi.com.br/v1/<label class="nome-integracao fw-bold">nome_integracao</label>/{operacao}</p>
+                        <p class="fs-6 fst-italic">@ConfigurationHelper.GetSetting("Aplicacao:urlHubIntegracao")/v1/<label class="nome-integracao fw-bold">nome_integracao</label>/{operacao}</p>
                     </div>
                     <div class="col-6">
                         <label for="tipoIntegracao" class="form-label">Tipo de Integração</label>
                         <select class="form-select" asp-for="TipoIntegracao" name="tipoIntegracao" required>
-                            <option value="">Selecione...</option>
                             <option value="rest">API para API</option>
                             <option value="soap">API para SOAP</option>
+                            <option value="sqc">API para SQC</option>
                         </select>
                     </div>
                 </div>

@@ -18,43 +18,35 @@ EditarOperacoes = {
         };
 
         const editorRequest = document.getElementById("jsoneditor_request");
-        editorJsonRequest = new JSONEditor(editorRequest, options);
-        let json_request = $("input[name='JsonRequestOperacao']").val();
-        if (json_request === '')
-            json_request = {
-                "atributo-texto": "texto",
-                "atributo-numero": 0,
-                "atributo-objeto": {
+        if (editorRequest) {
+            editorJsonRequest = new JSONEditor(editorRequest, options);
+            let json_request = $("input[name='JsonRequestOperacao']").val();
+            if (json_request === '')
+                json_request = {
                     "atributo-texto": "texto",
-                    "atributo-numero": 0
-                }
-            };
-        EditarOperacoes.CarregarEditorRequestJson(json_request);
-
-        const editorResponse = document.getElementById("jsoneditor_response");
-        editorJsonResponse = new JSONEditor(editorResponse, options);
-        let json_response = $("input[name='JsonResponseOperacao']").val();
-        if (json_response === '')
-            json_response = {
-                "data": {},
-                "mensagens": []
-            };
-        EditarOperacoes.CarregarEditorResponseJson(json_response);
+                    "atributo-numero": 0,
+                    "atributo-objeto": {
+                        "atributo-texto": "texto",
+                        "atributo-numero": 0
+                    }
+                };
+            else
+                json_request = JSON.parse(json_request);
+            editorJsonRequest.set(json_request);
+        }
         
+        const editorResponse = document.getElementById("jsoneditor_response");
+        if (editorResponse) {
+            editorJsonResponse = new JSONEditor(editorResponse, options);
+            let json_response = $("input[name='JsonResponseOperacao']").val();
+            if (json_response === '')
+                json_response = { "data": {}, "mensagens": [] };
+            else 
+                json_response = JSON.parse(json_response);
+            editorJsonResponse.set(json_response);
+        }
     },
     
-    CarregarEditorRequestJson: function (json) {
-        if (!editorJsonRequest)
-            return;
-        editorJsonRequest.set(json);
-    },
-    
-    CarregarEditorResponseJson: function (json) {
-        if (!editorJsonResponse)
-            return;
-        editorJsonResponse.set(json);
-    },
-
     InitGravarOperacao: function () {
         $('#form-operacao').submit(function(event){
             if (!this.checkValidity()) {
@@ -68,6 +60,7 @@ EditarOperacoes = {
             const jsonResponse = editorJsonResponse.get();
             $("input[name='JsonRequestOperacao']").val(JSON.stringify(jsonRequest));
             $("input[name='JsonResponseOperacao']").val(JSON.stringify(jsonResponse));
+            const idIntegracao = $("#IdIntegracao").val();
             $.ajax({
                 cache: false,
                 type: "POST",
@@ -80,6 +73,7 @@ EditarOperacoes = {
                         return;
                     }
                     Global.ExibirMensagem(result.mensagem);
+                    EditarIntegracao.CarregarOperacoes(idIntegracao);
                 }, error: function (XMLHttpRequest, textStatus, errorThrown) {
                     Global.ExibirMensagem(errorThrown, true);
                 }
@@ -88,9 +82,12 @@ EditarOperacoes = {
         });
     },
     NovaOperacao: function () {
-        console.log("Nova operacao.");
+        const idIntegracao = $("#IdIntegracao").val();
+        EditarIntegracao.CarregarOperacoes(idIntegracao);
     },
     InitConfiguracaoListaOperacoes: function () {
+        const json_view = document.getElementById("jsoneditor_view_modal");
+        if (!json_view) return;
         const viewJson = new JSONEditor(document.getElementById("jsoneditor_view_modal"), { mode: 'view' });
         $(".exibir-json").click(function () {
             let tipo = $(this).data('tipo');
@@ -100,12 +97,58 @@ EditarOperacoes = {
             $("#modal_json").modal('show');
         });
         $(".editar-operacao").click(function () {
-            let idOperacao = $(this).data('id');
-            console.log("Editar operacao: " + idOperacao);
+            const idOperacao = $(this).data('id');
+            const idIntegracao = $("#IdIntegracao").val(); 
+            EditarOperacoes.CarregarOperacao(idIntegracao, idOperacao);
         });
         $(".remover-operacao").click(function () {
-            let idOperacao = $(this).data('id');
-            console.log("Remover operacao: " + idOperacao);
+            const idOperacao = $(this).data('id');
+            Global.ExibirConfirmacao("Remover Operação da Integração", "Confirma a remoção da operação ["+idOperacao+"] da integração.", 
+                EditarOperacoes.RemoverOperacao, null, "modalConfirmaRemocaoOperacao");
         });
     },
+    CarregarOperacao: function (idIntegracao, idOperacao) {
+        $.ajax({
+            cache: false,
+            type: "GET",
+            url: _contexto + "Integracao/CarregarEdicaoOperacao",
+            dataType: "json",
+            data: {
+                idIntegracao: idIntegracao,
+                idOperacao: idOperacao
+            },
+            success: function (result) {
+                if (result.hasErro) {
+                    Global.ExibirMensagem(result.erros, true);
+                    return;
+                }
+                $("div.operacoes").html(result.model);
+                EditarOperacoes.InitConfiguracao();
+            }, error: function (XMLHttpRequest, textStatus, errorThrown) {
+                Global.ExibirMensagem(errorThrown, true);
+            }
+        });
+    },
+    RemoverOperacao: function () {
+        const idOperacao = $("#IdOperacao").val();
+        const idIntegracao = $("#IdIntegracao").val();
+        $.ajax({
+            cache: false,
+            type: "POST",
+            url: _contexto + "Integracao/RemoverOperacao",
+            dataType: "json",
+            data: {
+                idOperacao: idOperacao
+            },
+            success: function (result) {
+                if (result.hasErro) {
+                    Global.ExibirMensagem(result.erros, true);
+                    return;
+                }
+                EditarIntegracao.CarregarOperacoes(idIntegracao);
+            }, error: function (XMLHttpRequest, textStatus, errorThrown) {
+                Global.ExibirMensagem(errorThrown, true);
+            }
+        });
+    }
 }

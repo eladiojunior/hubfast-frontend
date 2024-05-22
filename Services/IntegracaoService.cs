@@ -140,4 +140,23 @@ public class IntegracaoService: IIntegracaoService
         if (operacao != null)
             listarOperacoes.Remove(operacao);
     }
+
+    public OperacaoIntegracaoModel obterOperacaoPorId(string idOperacao)
+    {
+        return string.IsNullOrEmpty(idOperacao) ? null : 
+            _listOperacoesIntegracaoTemp.Select(kvp => kvp.Value
+                    .FirstOrDefault(obj => obj.IdOperacao == idOperacao))
+                .FirstOrDefault(item => item != null);
+    }
+
+    public void removerOperacao(string idOperacao)
+    {
+        foreach (var kvp in _listOperacoesIntegracaoTemp)
+        {
+            var item = kvp.Value.FirstOrDefault(obj => obj.IdOperacao == idOperacao);
+            if (item == null) continue;
+            kvp.Value.Remove(item);
+            break;
+        }
+    }
 }

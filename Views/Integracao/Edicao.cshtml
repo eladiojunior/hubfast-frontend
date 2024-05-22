@@ -1,4 +1,5 @@
-﻿@model EdicaoIntegracaoViewModel;
+﻿@using hubfast_frontend.Views.Helpers
+@model EdicaoIntegracaoViewModel;
 @{
     ViewBag.Title = "Configurar Integração";
     Layout = "_Layout";
@@ -50,14 +51,14 @@
                             <label for="nomeIntegracao" class="form-label">Nome da Integração</label> <i class="mx-1 fs-5 icon ion-information-circled" title="Insira um nome válido (sem espaços ou caracteres especiais, exceto '-' e '_')."></i>
                         </span>
                         <input type="text" asp-for="NomeIntegracao" class="form-control" name="nomeIntegracao" required="required" pattern="[a-zA-Z0-9_\-]+" autocomplete="off"/>
-                        <p class="fs-6 fst-italic">https://hub-integracao.paas.cassi.com.br/v@(Model.VersaoIntegracao)/<label class="nome-integracao fw-bold">@(string.IsNullOrEmpty(Model.NomeIntegracao) ? "nome_integracao" : Model.NomeIntegracao)</label>/{operacao}</p>
+                        <p class="fs-6 fst-italic">@ConfigurationHelper.GetSetting("Aplicacao:urlHubIntegracao")/v@(Model.VersaoIntegracao)/<label class="nome-integracao fw-bold">@(string.IsNullOrEmpty(Model.NomeIntegracao) ? "nome_integracao" : Model.NomeIntegracao)</label>/{operacao}</p>
                     </div>
                     <div class="col-6">
                         <label for="tipoIntegracao" class="form-label">Tipo de Integração</label>
                         <select class="form-select" asp-for="TipoIntegracao" name="tipoIntegracao" required>
-                            <option value="">Selecione...</option>
                             <option value="rest">API para API</option>
                             <option value="soap">API para SOAP</option>
+                            <option value="sqc">API para SQC</option>
                         </select>
                     </div>
                 </div>
@@ -97,7 +98,7 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Gravar <i class="ion-social-foursquare-outline"> </i> </button>
+                            <button type="submit" class="btn btn-primary">Gravar Integração <i class="ion-social-foursquare-outline"> </i> </button>
                         </div>
                     </div>
                 </div>

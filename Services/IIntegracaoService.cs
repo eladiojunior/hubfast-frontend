@@ -12,4 +12,6 @@ public interface IIntegracaoService
     List<OperacaoIntegracaoModel> listarOperacaoIntegracao(string idIntegracao);
     OperacaoIntegracaoModel gravarOperacaoIntegracao(string idIntegracao, OperacaoIntegracaoModel model);
     void removerOperacaoIntegracao(string idIntegracao, string idOperacao);
+    OperacaoIntegracaoModel obterOperacaoPorId(string idOperacao);
+    void removerOperacao(string idOperacao);
 }

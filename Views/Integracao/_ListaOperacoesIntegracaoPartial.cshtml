@@ -16,7 +16,7 @@ else
             <th scope="col">Nome Operação</th>
             <th scope="col">Request</th>
             <th scope="col">Response</th>
-            <th scope="col">Ação</th>
+            <th scope="col" class="text-center">Ação</th>
         </tr>
         </thead>
         <tbody>
@@ -25,21 +25,21 @@ else
             <tr>
                 <th scope="row">@item.TipoMetodoOperacao.DescricaoEnum()</th>
                 <td>@item.NomeOperacao</td>
-                <td>
+                <td class="text-center">
                     @item.AtributosRequest.Count
                     <a href="#" data-json="@item.JsonRequest" data-tipo="Json Request" class="exibir-json" title="Exibir o JSON da Request">
                         <i class="icon ion-code-working fs-5"></i>
                     </a>
                 </td>
-                <td>
+                <td class="text-center">
                     @item.AtributosResponse.Count
                     <a href="#" data-json="@item.JsonResponse" data-tipo="Json Response" class="exibir-json" title="Exibir o JSON da Response">
                         <i class="icon ion-code-working fs-5"></i>
                     </a>
                 </td>
-                <td>
-                    <a href="#" data-id="@item.IdOperacao" class="editar-operacao"><i class="icon ion-edit fs-5"></i></a>
-                    <a href="#" data-id="@item.IdOperacao" class="remover-operacao"><i class="icon ion-trash-a fs-5"></i></a>
+                <td class="text-center">
+                    <a href="#" data-id="@item.IdOperacao" class="editar-operacao" title="Editar operação"><i class="icon ion-edit fs-5"></i></a>
+                    <a href="#" data-id="@item.IdOperacao" class="remover-operacao" title="Remover operação"><i class="icon ion-trash-a fs-5"></i></a>
                 </td>
             </tr>
         }

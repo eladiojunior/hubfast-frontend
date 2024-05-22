@@ -6,7 +6,7 @@ public class IntegracaoModel
 {
     public string IdIntegracao { get; set; }
     public string NomeIntegracao { get; set; }
-    public string TipoIntegracao { get; set; }
+    public TipoIntegracaoEnum TipoIntegracao { get; set; }
     public int VersaoIntegracao { get; set; }
     public string DescricaoIntegracao { get; set; }
     public bool OpcaoHealthcheck { get; set; }

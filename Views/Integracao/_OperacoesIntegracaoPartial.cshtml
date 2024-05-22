@@ -1,5 +1,6 @@
 ﻿@using hubfast_frontend.Services.Models.Enums
 @using hubfast_frontend.Services.Helpers
+@using hubfast_frontend.Views.Helpers
 @model OperacoesIntegracaoViewModel
 
 <div class="container">
@@ -19,7 +20,7 @@
             <div class="col-10">
                 <label for="nomeOperacao" class="form-label">Nome da Operação</label>
                 <div class="input-group">
-                    <span class="input-group-text" id="basic-addon3">https://hub-integracao.paas.cassi.com.br/v@(Model.VersaoIntegracao)/@(Model.NomeIntegracao)/</span>
+                    <span class="input-group-text" id="basic-addon3">@ConfigurationHelper.GetSetting("Aplicacao:urlHubIntegracao")/v@(Model.VersaoIntegracao)/@(Model.NomeIntegracao)/</span>
                     <input type="text" asp-for="NomeOperacao" class="form-control" id="nomeOperacao" name="NomeOperacao" placeholder="nome_operacao" pattern="[a-zA-Z0-9_\-]+" required="required" autocomplete="off" aria-describedby="basic-addon3">
                 </div>
             </div>
