@@ -25,14 +25,40 @@ else
             <tr>
                 <th scope="row">@item.TipoMetodoOperacao.DescricaoEnum()</th>
                 <td>@item.NomeOperacao</td>
-                <td>@item.JsonRequest</td>
-                <td>@item.JsonResponse</td>
                 <td>
-                    <a href="#" class="editar-operacao"><i class="icon ion-edit fs-2"></i></a>
-                    <a href="#" class="remover-operacao"><i class="icon ion-trash-a fs-2"></i></a>
+                    @item.AtributosRequest.Count
+                    <a href="#" data-json="@item.JsonRequest" data-tipo="Json Request" class="exibir-json" title="Exibir o JSON da Request">
+                        <i class="icon ion-code-working fs-5"></i>
+                    </a>
+                </td>
+                <td>
+                    @item.AtributosResponse.Count
+                    <a href="#" data-json="@item.JsonResponse" data-tipo="Json Response" class="exibir-json" title="Exibir o JSON da Response">
+                        <i class="icon ion-code-working fs-5"></i>
+                    </a>
+                </td>
+                <td>
+                    <a href="#" data-id="@item.IdOperacao" class="editar-operacao"><i class="icon ion-edit fs-5"></i></a>
+                    <a href="#" data-id="@item.IdOperacao" class="remover-operacao"><i class="icon ion-trash-a fs-5"></i></a>
                 </td>
             </tr>
         }
         </tbody>
     </table>
+    <div class="modal fade" id="modal_json" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="titulo_modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="titulo_modal">JSON</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="jsoneditor_view_modal" class="json"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }

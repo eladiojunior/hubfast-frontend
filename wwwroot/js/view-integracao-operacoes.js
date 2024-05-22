@@ -8,6 +8,7 @@ EditarOperacoes = {
         $(".nova-operacao").click(function () {
             EditarOperacoes.NovaOperacao();
         });
+        EditarOperacoes.InitConfiguracaoListaOperacoes();
     },
     
     InitEditorJson: function () {
@@ -64,9 +65,7 @@ EditarOperacoes = {
             $(this).addClass('was-validated');
             //Carregar JSON nos inputs
             const jsonRequest = editorJsonRequest.get();
-            console.log(jsonRequest);
             const jsonResponse = editorJsonResponse.get();
-            console.log(jsonResponse);
             $("input[name='JsonRequestOperacao']").val(JSON.stringify(jsonRequest));
             $("input[name='JsonResponseOperacao']").val(JSON.stringify(jsonResponse));
             $.ajax({
@@ -90,5 +89,23 @@ EditarOperacoes = {
     },
     NovaOperacao: function () {
         console.log("Nova operacao.");
+    },
+    InitConfiguracaoListaOperacoes: function () {
+        const viewJson = new JSONEditor(document.getElementById("jsoneditor_view_modal"), { mode: 'view' });
+        $(".exibir-json").click(function () {
+            let tipo = $(this).data('tipo');
+            let json = $(this).data('json');
+            $("#titulo_modal").html(tipo);
+            viewJson.set(json);
+            $("#modal_json").modal('show');
+        });
+        $(".editar-operacao").click(function () {
+            let idOperacao = $(this).data('id');
+            console.log("Editar operacao: " + idOperacao);
+        });
+        $(".remover-operacao").click(function () {
+            let idOperacao = $(this).data('id');
+            console.log("Remover operacao: " + idOperacao);
+        });
     },
 }

@@ -3,14 +3,12 @@
     InitConfiguracao: function () {
         $("input[name='nomeIntegracao']").on('keyup', function (event) {
             let nome = $(this).val();
-            if (nome === '')
-                nome = '{nome_integracao}';
+            if (nome === '') nome = '{nome_integracao}';
             $("label.nome-integracao").text(nome);
         });
         $('#tabsConfiguracao a').on('click', function (event) {
             var idIntegracao = $("#IdIntegracao").val();
             var nome_tab = $(this).data('tab');
-            console.log(nome_tab);
             if ('tab_operacoes' === nome_tab) {
                 EditarIntegracao.CarregarOperacoes(idIntegracao);
             }

@@ -8,3 +8,9 @@ Com sua abordagem ágil e flexível, o HUB Fast oferece uma solução abrangente
 Para implementação desta ferramenta será utilizando:
 - no fontendo: .NET MVC
 - no backend: Java com SpringBoot
+
+# Soluções externas:
+- JSONEditor: https://github.com/josdejong/jsoneditor
+- Ionicons: https://ionic.io/ionicons/v1
+- Bootstrap 5.1: https://getbootstrap.com/docs/5.0
+- JQuery 3.6: https://jquery.com/
