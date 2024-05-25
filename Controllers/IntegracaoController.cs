@@ -142,16 +142,6 @@ public class IntegracaoController : GenericController
         return View("Edicao", viewModel);
     }
 
-    public IActionResult Remover(string idIntegracao)
-    {
-        if (string.IsNullOrEmpty(idIntegracao))
-            return RedirectToAction("Index", "Home");
-
-        _integracaoService.removerIntegracao(idIntegracao);
-
-        return RedirectToAction("Index", "Home");
-    }
-
     //GET: Integracao/ListarOperacoesIntegracao
     [HttpGet]
     public JsonResult ListarOperacoesIntegracao(string idIntegracao)
@@ -363,5 +353,49 @@ public class IntegracaoController : GenericController
             _logger.LogError(erro, mensagem);
             return JsonResultErro(mensagem);
         }
+    }
+    
+    //GET: Integracao/ListarIntegracoes
+    [HttpGet]
+    public JsonResult ListarIntegracoes()
+    {
+        try
+        {
+            var lista = _integracaoService.listarIntegracao();
+            var viewString = _viewRenderService.RenderToStringAsync("Integracao/_ListaIntegracoesPartial", lista).Result;
+            return JsonResultSucesso(viewString, "Lista de integrações com sucesso.");
+        }
+        catch (NegocioException erro_negocio)
+        {
+            return JsonResultErro(erro_negocio.Message);
+        }
+        catch (Exception erro)
+        {
+            var mensagem = $"Erro ao listar de integrações.";
+            _logger.LogError(erro, mensagem);
+            return JsonResultErro(mensagem);
+        }
+    }
+
+    //DELETE: Integracao/RemoverIntegracao
+    [HttpDelete]
+    public JsonResult RemoverIntegracao(string idIntegracao)
+    {
+        try
+        {
+            _integracaoService.removerIntegracao(idIntegracao);
+            return JsonResultSucesso("Integração removida com sucesso.");
+        }
+        catch (NegocioException erro_negocio)
+        {
+            return JsonResultErro(erro_negocio.Message);
+        }
+        catch (Exception erro)
+        {
+            var mensagem = $"Erro ao remover a integração.";
+            _logger.LogError(erro, mensagem);
+            return JsonResultErro(mensagem);
+        }
+        
     }
 }

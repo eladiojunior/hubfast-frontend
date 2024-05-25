@@ -25,12 +25,12 @@
                         <span class="d-inline-block">
                             <label for="nomeIntegracao" class="form-label">Nome da Integração</label> <i class="mx-1 fs-5 icon ion-information-circled" title="Insira um nome válido (sem espaços ou caracteres especiais, exceto '-' e '_')."></i>
                         </span>
-                        <input type="text" asp-for="NomeIntegracao" class="form-control" name="nomeIntegracao" pattern="[a-zA-Z0-9_\-]+" required="required" autocomplete="off"/>
+                        <input type="text" asp-for="NomeIntegracao" class="form-control" pattern="[a-zA-Z0-9_\-]+" required="required" autocomplete="off"/>
                         <p class="fs-6 fst-italic">@ConfigurationHelper.GetSetting("Aplicacao:urlHubIntegracao")/v1/<label class="nome-integracao fw-bold">nome_integracao</label>/{operacao}</p>
                     </div>
                     <div class="col-6">
                         <label for="tipoIntegracao" class="form-label">Tipo de Integração</label>
-                        <select class="form-select" asp-for="CodigoTipoIntegracao" name="tipoIntegracao" required>
+                        <select class="form-select" asp-for="CodigoTipoIntegracao" required>
                             @foreach (var tipo in EnumsHelper.ListarEnums<TipoIntegracaoEnum>())
                             {
                                 <option value="@tipo.CodigoEnum()">@tipo.DescricaoEnum()</option>
@@ -41,19 +41,19 @@
                 <div class="row mt-2 mb-3">
                     <div class="col-6">
                         <label for="descricaoIntegracao" class="form-label">Descrição da Integração</label>
-                        <textarea class="form-control" asp-for="DescricaoIntegracao" name="descricaoIntegracao" id="descricaoIntegracao" rows="8"></textarea>
+                        <textarea class="form-control" asp-for="DescricaoIntegracao" id="descricaoIntegracao" rows="8"></textarea>
                     </div>
                     <div class="col-6">
                         <label class="form-label">Opções de Integração</label>
                         <div class="form-check">
                             <label class="form-check-label" for="opcaoHealthcheck">
-                                <input class="form-check-input" type="checkbox" asp-for="OpcaoHealthcheck" name="opcaoHealthcheck" id="opcaoHealthcheck"> Healthcheck
+                                <input class="form-check-input" type="checkbox" asp-for="OpcaoHealthcheck" id="opcaoHealthcheck"> Healthcheck
                             </label>
                             <div class="fs-6 fst-italic">Verificar a saúde da API exposta na integração.</div>
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="opcaoLogService">
-                                <input class="form-check-input" type="checkbox" asp-for="OpcaoLogService" name="opcaoLogService" id="opcaoLogService"> Log Service
+                                <input class="form-check-input" type="checkbox" asp-for="OpcaoLogService" id="opcaoLogService"> Log Service
                             </label>
                             <div class="fs-6 fst-italic">Registrar os logs de transações da integração.</div>
                         </div>

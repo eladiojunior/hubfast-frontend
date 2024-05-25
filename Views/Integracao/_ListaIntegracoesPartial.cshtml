@@ -1,5 +1,4 @@
-﻿@using hubfast_frontend.Views.Helpers
-@using hubfast_frontend.Services.Helpers
+﻿@using hubfast_frontend.Services.Helpers
 @model List<IntegracaoModel>
 @if (Model == null || Model.Count == 0)
 {
@@ -7,6 +6,7 @@
 }
 else
 {
+    <input type="hidden" id="idIntegracao"/>
     <table class="table table-striped table-hover">
     <thead>
     <tr>
@@ -46,26 +46,9 @@ else
             <td>@item.SituacaoIntegracao.DescricaoEnum()</td>
             <td class="text-center">
                 <a asp-action="CarregarEditar" asp-controller="Integracao" asp-route-idIntegracao="@item.IdIntegracao"><i class="icon ion-edit fs-5"></i></a>
-                <a asp-action="Remover" asp-controller="Integracao" asp-route-idIntegracao="@item.IdIntegracao"><i class="icon ion-trash-a fs-5"></i></a>
+                <a href="#" data-id="@item.IdIntegracao" class="remover-integracao"><i class="icon ion-trash-a fs-5"></i></a>
             </td>
         </tr>
-        
-        <div class="card">
-            <div class="card-body">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-5">
-                            <div class="card-title"></div>
-                            <div class="card-text">Tipo: </div>
-                        </div>
-                        <div class="col-5">
-                        </div>
-                        <div class="col-2">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     }
         </tbody>
     </table>

@@ -12,7 +12,10 @@
         <a class="btn btn-primary mt-2 mb-2" asp-action="Novo" asp-controller="Integracao">Nova Integração</a>    
     </div>
     <hr/>
-    @{
-        await Html.RenderPartialAsync("_ListaIntegracoesPartial", Model);
-    }
+    <div class="lista-integracoes">
+        <i class="icon ion-loading-a"> </i> Carregando lista de integrações...
+    </div>
 </div>
+@section Scripts {
+    <script src="@Url.Content("~/js/view-home.js")"></script>
+}
