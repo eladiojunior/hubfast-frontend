@@ -1,0 +1,28 @@
+﻿@model HealthcheckViewModel
+<div class="container">
+    @if (Model.CodigoSituacaoIntegracao != SituacaoIntegracaoEnum.Publicada.CodigoEnum())
+    {//
+        <div class="row mt-3">
+            <div class="alert alert-info">
+                Com o Healthcheck ativado será necessário verificar a saúde de casa API de backend para uma verificação completa da saúde da integração.
+            </div>
+        </div>
+
+        if (Model.ApisBackend != null && Model.ApisBackend.Count > 0)
+        {//Apresentar as Apis Backend para configurar os healhchecks ou informar que não existem
+            
+        }
+        else
+        {
+            <div class="row mt-3">
+                <div class="alert alert-warning">
+                    Não existe nenhuma API de Backend registrar na Integração para configuração do Heathcheck. Acesse a aba 'APIs de Backend' e registre para construção da integração.
+                </div>
+            </div>
+        }
+    }
+    else
+    {// Apresentar os status dos healthcheck mapeados...
+        
+    }
+</div>

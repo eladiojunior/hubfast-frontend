@@ -4,6 +4,7 @@ namespace hubfast_frontend.Services.Models;
 
 public class OperacaoIntegracaoModel
 {
+    public string IdIntegracao { get; set; }
     public string IdOperacao { get; set; }
     public string NomeOperacao { get; set; }
     public TipoMetodoRestEnum TipoMetodoOperacao { get; set; }

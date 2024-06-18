@@ -1,0 +1,163 @@
+﻿@section Styles {
+    <style>
+        .container {
+            position: relative;
+            height: 100vh;
+        }
+        .component {
+            width: 150px;
+            padding: 10px;
+            text-align: center;
+            color: white;
+            border-radius: 5px;
+            cursor: move;
+        }
+        .integration {
+            background-color: #007bff;
+            position: absolute;
+        }
+        .api {
+            background-color: #28a745;
+            position: absolute;
+        }
+    </style>
+}
+
+<div class="container mt-5">
+    <h1 class="text-center">Arrasta e Solta Conectores</h1>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <h3>Adicionar API</h3>
+            <form id="addAPIForm">
+                <div class="mb-3">
+                    <label for="apiName" class="form-label">Nome da API</label>
+                    <input type="text" class="form-control" id="apiName" required>
+                </div>
+                <button type="submit" class="btn btn-success">Adicionar API</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Integrações</h3>
+            <div id="integrationList">
+                <div id="integration1" class="component integration" style="top: 50px; left: 50px;">
+                    Integração 1
+                </div>
+                <div id="integration2" class="component integration" style="top: 200px; left: 50px;">
+                    Integração 2
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h3>APIs</h3>
+            <div id="apiList">
+                <div id="api1" class="component api" style="top: 50px; left: 300px;">
+                    API 1
+                </div>
+                <div id="api2" class="component api" style="top: 200px; left: 300px;">
+                    API 2
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.6/js/jsplumb.min.js"></script>
+    <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var jsPlumbInstance = jsPlumb.getInstance({
+                    Endpoint: ["Dot", { radius: 2 }],
+                    Connector: ["Bezier", { curviness: 50 }],
+                    PaintStyle: { stroke: "#000", strokeWidth: 2 },
+                    Overlays: [["Arrow", { width: 10, length: 10, location: 1 }]],
+                    Container: "container"
+                });
+    
+                // Habilitar arrastar e soltar para as integrações e APIs
+                jsPlumbInstance.draggable(jsPlumb.getSelector(".component"));
+    
+                // Configurar pontos de ancoragem e fazer conexões
+                var common = {
+                    anchor: "Continuous",
+                    connector: ["Bezier", { curviness: 50 }],
+                    endpoint: ["Dot", { radius: 2 }],
+                    paintStyle: { stroke: "#000", strokeWidth: 2 },
+                    overlays: [["Arrow", { width: 10, length: 10, location: 1 }]]
+                };
+    
+                jsPlumbInstance.makeSource(jsPlumb.getSelector(".integration"), {
+                    filter: ".integration",
+                    anchor: "Continuous",
+                    connectorStyle: { stroke: "#5c96bc", strokeWidth: 2, outlineStroke: "transparent", outlineWidth: 4 },
+                    connectionType: "basic",
+                    extract: {
+                        "action": "the-action"
+                    },
+                    maxConnections: 2,
+                    onMaxConnections: function (info, e) {
+                        alert("Maximum connections (" + info.maxConnections + ") reached");
+                    }
+                });
+    
+                jsPlumbInstance.makeTarget(jsPlumb.getSelector(".api"), {
+                    dropOptions: { hoverClass: "dragHover" },
+                    anchor: "Continuous",
+                    allowLoopback: false
+                });
+    
+                // Exemplo de conexão inicial
+                jsPlumbInstance.connect({
+                    source: "integration1",
+                    target: "api1",
+                    type: "basic"
+                });
+    
+                // Listener para criar novas conexões
+                jsPlumbInstance.bind("connection", function (info) {
+                    console.log("Connection from " + info.sourceId + " to " + info.targetId);
+                    createDeleteButton(info.connection);
+                });
+    
+                // Adicionar nova API
+                document.getElementById("addAPIForm").addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    var apiName = document.getElementById("apiName").value;
+                    var apiId = "api" + new Date().getTime(); // Gerar um ID único baseado no timestamp
+                    var apiElement = document.createElement("div");
+                    apiElement.className = "component api";
+                    apiElement.id = apiId;
+                    apiElement.style.top = "100px";
+                    apiElement.style.left = "300px";
+                    apiElement.innerHTML = apiName;
+    
+                    document.getElementById("apiList").appendChild(apiElement);
+                    jsPlumbInstance.draggable(apiElement);
+                    jsPlumbInstance.makeTarget(apiElement, {
+                        dropOptions: { hoverClass: "dragHover" },
+                        anchor: "Continuous",
+                        allowLoopback: false
+                    });
+    
+                    document.getElementById("apiName").value = ""; // Limpar o campo de entrada
+                });
+    
+                // Criar botão de deletar conexões
+                function createDeleteButton(connection) {
+                    var deleteButton = document.createElement("button");
+                    deleteButton.innerHTML = "x";
+                    deleteButton.className = "btn btn-danger btn-sm";
+                    deleteButton.style.position = "absolute";
+                    deleteButton.style.top = "0";
+                    deleteButton.style.right = "0";
+    
+                    deleteButton.addEventListener("click", function () {
+                        jsPlumbInstance.deleteConnection(connection);
+                    });
+    
+                    connection.getOverlay("label").appendChild(deleteButton);
+                }
+            });
+        </script>
+}

@@ -8,36 +8,47 @@ namespace hubfast_frontend.Services;
 public class IntegracaoService: IIntegracaoService
 {
     private static List<IntegracaoModel> _listIntegracoesTemp = new List<IntegracaoModel>();
-    private static Dictionary<String, List<OperacaoIntegracaoModel>> _listOperacoesIntegracaoTemp = new Dictionary<string, List<OperacaoIntegracaoModel>>();
+    private static Dictionary<string, AuthorizationIntegracaoModel> _listAutorIntegracoesTemp = new Dictionary<string, AuthorizationIntegracaoModel>();
     
     public IntegracaoModel gravarIntegracao(IntegracaoModel model)
     {
+        
         if (string.IsNullOrEmpty(model.NomeIntegracao))
             throw new NegocioException("Nome da integração não informado.");
+        
         if (!ServicesHelper.validarNomeIntegracao(model.NomeIntegracao))
             throw new NegocioException("Nome da integração inválido, informe um nome sem espaços ou caracteres especiais, exceto '-' e '_'.");
-        
+
+        var integracaoExistente = obterIntegracaoPorNome(model.NomeIntegracao);
+        if (integracaoExistente != null && 
+            integracaoExistente.VersaoIntegracao != model.VersaoIntegracao &&
+            integracaoExistente.IdIntegracao != model.IdIntegracao)
+            throw new NegocioException($"Integração com o nome [{integracaoExistente.NomeIntegracao}] já registrada na versão [{integracaoExistente.VersaoIntegracao}] e situação [{integracaoExistente.SituacaoIntegracao.DescricaoEnum()}]");
+
         if (string.IsNullOrEmpty(model.IdIntegracao))
         {
-            
-            var integracaoExistente = obterIntegracaoPorNome(model.NomeIntegracao);
-            if (integracaoExistente != null)
-                throw new NegocioException($"Integração com o nome [{integracaoExistente.NomeIntegracao}] já registrada na versão [{integracaoExistente.VersaoIntegracao}] e situação [{integracaoExistente.SituacaoIntegracao.DescricaoEnum()}]");
-
             model.IdIntegracao = Guid.NewGuid().ToString();
             model.VersaoIntegracao = 1;
             model.SituacaoIntegracao = SituacaoIntegracaoEnum.EmEdicao;
             _listIntegracoesTemp.Add(model);
             return model;
-           
         }
 
+        //Remover o item para UPDATE se existir, REMOVER quando tiver banco.
         var item = _listIntegracoesTemp.Find(m => m.IdIntegracao == model.IdIntegracao);
         if (item != null)
             _listIntegracoesTemp.Remove(item);
         
-        _listIntegracoesTemp.Add(model);
-        return model;
+        item.NomeIntegracao = model.NomeIntegracao;
+        item.TipoIntegracao = model.TipoIntegracao;
+        item.DescricaoIntegracao = model.DescricaoIntegracao;
+        item.OpcaoHealthcheck = model.OpcaoHealthcheck;
+        item.OpcaoAuthorization = model.OpcaoAuthorization;
+        item.OpcaoSwagger = model.OpcaoSwagger;
+        item.OpcaoLogService = model.OpcaoLogService;
+        
+        _listIntegracoesTemp.Add(item);
+        return item;
         
     }
     public List<IntegracaoModel> listarIntegracao()
@@ -70,93 +81,47 @@ public class IntegracaoService: IIntegracaoService
         
     }
 
-    public List<OperacaoIntegracaoModel> listarOperacaoIntegracao(string idIntegracao)
+    public AuthorizationIntegracaoModel? obterAutorizacaoIntegracao(string idIntegracao)
     {
-        
-        if (string.IsNullOrEmpty(idIntegracao))
-            return null;
-        return _listOperacoesIntegracaoTemp.GetValueOrDefault(idIntegracao);
-        
+        return _listAutorIntegracoesTemp.GetValueOrDefault(idIntegracao);
     }
 
-    public OperacaoIntegracaoModel gravarOperacaoIntegracao(string idIntegracao, OperacaoIntegracaoModel model)
+    public AuthorizationIntegracaoModel gravarAutorizacaoIntegracao(AuthorizationIntegracaoModel model)
     {
-        
         if (model == null)
-            throw new NegocioException($"Nenhuma informação da operação informada.");
-        if (string.IsNullOrEmpty(model.NomeOperacao)) 
-            throw new NegocioException($"Nome da operação não informado.");
-        if (string.IsNullOrEmpty(model.JsonRequest)) 
-            throw new NegocioException($"Informações da requisição de entrada (Request) não informado.");
-        if (model.AtributosRequest == null || model.AtributosRequest.Count == 0) 
-            throw new NegocioException($"Atributos da requisição de entrada (Request) não carregados do Json.");
-        if (string.IsNullOrEmpty(model.JsonResponse)) 
-            throw new NegocioException($"Informações da requisição de saída (Response) não informado.");
-        if (model.AtributosResponse == null || model.AtributosResponse.Count == 0) 
-            throw new NegocioException($"Atributos da requisição de saída (Response) não carregados do Json.");
-        
-        var listaOperacoes = listarOperacaoIntegracao(idIntegracao);
-        if (listaOperacoes != null)
-        {
-            if (string.IsNullOrEmpty(model.IdOperacao))
-            {//Novo
-                var operacao = listaOperacoes.FirstOrDefault(w => w.NomeOperacao == model.NomeOperacao);
-                if (operacao != null)
-                    throw new NegocioException($"Já existe uma operação com o nome [{model.NomeOperacao}], não é permitido duplicidade.");
-                model.IdOperacao = Guid.NewGuid().ToString();
-                listaOperacoes.Add(model);
-            }
-            else
-            {// Atualizar
-                var operacao = listaOperacoes.FirstOrDefault(w => w.IdOperacao == model.IdOperacao);
-                if (operacao == null)
-                    listaOperacoes.Add(model);
-                else
-                {
-                    listaOperacoes.Remove(operacao);
-                    listaOperacoes.Add(model);
-                }
-            }
-            return model;
-        }
+            throw new NegocioException("Authorization da integração não informado.");
+        if (string.IsNullOrEmpty(model.IdIntegracao))
+            throw new NegocioException("Identificado da integração não informado.");
+        if (model.TipoAutorizacao != TipoAutorizacaoEnum.NoAuth && (model.ParmsAutorizacao == null || model.ParmsAutorizacao.Count == 0)) 
+            throw new NegocioException("Nenhum parametro de autenticação informado para o tipo de autenticação.");
 
-        model.IdOperacao = Guid.NewGuid().ToString();
-        listaOperacoes = new List<OperacaoIntegracaoModel>();
-        listaOperacoes.Add(model);
-        
-        //Criar objeto...
-        _listOperacoesIntegracaoTemp.Add(idIntegracao, listaOperacoes);
+        var integracao = obterIntegracaoPorId(model.IdIntegracao);
+        if  (integracao == null)
+            throw new NegocioException($"Integração com o Id [{model.IdIntegracao}] não encontrada.");
 
+        var autorizacao = obterAutorizacaoIntegracao(model.IdIntegracao);
+        if (autorizacao != null)
+            _listAutorIntegracoesTemp.Remove(model.IdIntegracao);
+        else
+            model.IdAutorizacao = Guid.NewGuid().ToString();
+        
+        _listAutorIntegracoesTemp.Add(model.IdIntegracao, model);
         return model;
         
     }
 
-    public void removerOperacaoIntegracao(string idIntegracao, string idOperacao)
+    public void removerAutorizacaoIntegracao(string idIntegracao)
     {
-        var listarOperacoes = listarOperacaoIntegracao(idIntegracao);
-        if (listarOperacoes == null) 
-            return;
-        var operacao = listarOperacoes.FirstOrDefault(w => w.IdOperacao == idOperacao);
-        if (operacao != null)
-            listarOperacoes.Remove(operacao);
-    }
+        if (string.IsNullOrEmpty(idIntegracao))
+            throw new NegocioException("Identificado da integração não informado.");
 
-    public OperacaoIntegracaoModel obterOperacaoPorId(string idOperacao)
-    {
-        return string.IsNullOrEmpty(idOperacao) ? null : 
-            _listOperacoesIntegracaoTemp.Select(kvp => kvp.Value
-                    .FirstOrDefault(obj => obj.IdOperacao == idOperacao))
-                .FirstOrDefault(item => item != null);
-    }
+        var integracao = obterIntegracaoPorId(idIntegracao);
+        if  (integracao == null)
+            throw new NegocioException($"Integração com o Id [{idIntegracao}] não encontrada.");
 
-    public void removerOperacao(string idOperacao)
-    {
-        foreach (var kvp in _listOperacoesIntegracaoTemp)
-        {
-            var item = kvp.Value.FirstOrDefault(obj => obj.IdOperacao == idOperacao);
-            if (item == null) continue;
-            kvp.Value.Remove(item);
-            break;
-        }
+        var autorizacao = obterAutorizacaoIntegracao(idIntegracao);
+        if (autorizacao != null)
+            _listAutorIntegracoesTemp.Remove(idIntegracao);
     }
+    
 }

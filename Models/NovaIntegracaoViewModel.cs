@@ -2,7 +2,7 @@
 
 namespace hubfast_frontend.Models;
 
-public class GravarIntegracaoViewModel
+public class NovaIntegracaoViewModel
 {
     [Required(ErrorMessage = "Nome da integração não informado")]
     [MaxLength(50, ErrorMessage = "Nome da integração não pode ser maior que 50 caracteres")]

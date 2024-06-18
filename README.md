@@ -6,7 +6,7 @@ Com sua abordagem ágil e flexível, o HUB Fast oferece uma solução abrangente
 
 # Tecnologia
 Para implementação desta ferramenta será utilizando:
-- no fontendo: .NET MVC
+- no fontend: .NET6 MVC Razon
 - no backend: Java com SpringBoot
 
 # Soluções externas:

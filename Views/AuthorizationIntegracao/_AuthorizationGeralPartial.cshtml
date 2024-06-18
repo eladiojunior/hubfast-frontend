@@ -1,0 +1,33 @@
+﻿@model List<ParmAutorizacaoModel> 
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-info">Nenhum tipo de autentização informado para integração.<br/>As requisições desta integração <strong>NÃO serão autenticadas</strong> por nenhum método.</div>
+}
+else
+{
+    if (Model.Count == 1)
+    {
+        <div class="alert alert-info">
+            <strong>Bearer Token</strong> é um método de autenticação que utiliza um token de acesso. Esse token é geralmente obtido após uma autenticação inicial e é incluído no cabeçalho HTTP 'Authorization' com o prefixo "Bearer". O token possui uma validade limitada e pode ser revogado. Este método é amplamente utilizado por sua simplicidade e segurança, especialmente em APIs RESTful.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <strong>API Key</strong> é um método de autenticação que utiliza uma chave única gerada para identificar o chamador de uma API. A chave é geralmente enviada como um parâmetro de URL ou no cabeçalho HTTP 'Authorization'. Este método é simples e eficaz para autenticar chamadas de API, mas não fornece segurança robusta por si só.
+        </div>
+    }
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        var key = Model[i].Key;
+        var value = Model[i].Value;
+
+        <div class="row mt-3">
+            <label for="@key" class="col-3 col-form-label">@key</label>
+            <input type="hidden" name="ParmsAutorizacao[@i].Key" value="@key"/>
+            <div class="col-9">
+                <input type="text" name="ParmsAutorizacao[@i].Value" class="form-control" id="@key" placeholder="@key" value="@value">
+            </div>
+        </div>
+    }
+}

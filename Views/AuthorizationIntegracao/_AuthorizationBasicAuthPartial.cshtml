@@ -1,0 +1,26 @@
+﻿@model List<ParmAutorizacaoModel> 
+@{
+    var keyUsername = Model[0].Key;
+    var valueUsername = Model[0].Value;
+    var keyPassword = Model[1].Key;
+    var valuePassword = Model[1].Value;
+}
+<div class="row mt-3">
+    <div class="alert alert-info">
+        <strong>Autenticação Básica</strong> é um método simples para aplicar controle de acesso em uma API. Esse método utiliza um par de nome de usuário e senha, que são concatenados e codificados em Base64. Esse valor codificado é então enviado no cabeçalho HTTP 'Authorization'. Embora seja fácil de implementar, o Basic Auth não é considerado muito seguro porque as credenciais são facilmente decodificáveis.
+    </div>
+</div>
+<div class="row mt-3">
+    <label for="@keyUsername" class="col-3 col-form-label">@keyUsername</label>
+    <input type="hidden" name="ParmsAutorizacao[0].Key" value="@keyUsername"/>
+    <div class="col-9">
+        <input type="text" name="ParmsAutorizacao[0].Value" class="form-control" id="@keyUsername" placeholder="@keyUsername" value="@valueUsername">
+    </div>
+</div>  
+<div class="row mt-3">
+    <label for="@keyPassword" class="col-3 col-form-label">@keyPassword</label>
+    <input type="hidden" name="ParmsAutorizacao[1].Key" value="@keyPassword"/>
+    <div class="col-9">
+        <input type="password" name="ParmsAutorizacao[1].Value" class="form-control" id="@keyPassword" placeholder="@keyPassword" value="@valuePassword">
+    </div>
+</div>

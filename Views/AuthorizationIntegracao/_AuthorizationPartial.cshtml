@@ -1,0 +1,30 @@
+﻿@model AuthorizationIntegracaoViewModel
+<div class="container">
+    <form id="form-autorizacao" method="post">
+        <input asp-for="IdIntegracao" type="hidden"/>
+        <input asp-for="VersaoIntegracao" type="hidden"/>
+        <input asp-for="NomeIntegracao" type="hidden"/>
+        <input asp-for="IdAutorizacao" type="hidden"/>
+        <div class="row mt-2">
+            <div class="col-4">
+                <label for="CodigoTipoAutorizacao" class="form-label">Authorization</label>
+                <select class="form-select tipo-autorizacao" asp-for="CodigoTipoAutorizacao">
+                    @foreach (var tipo in EnumsHelper.ListarEnums<TipoAutorizacaoEnum>())
+                    {
+                        <option value="@tipo.CodigoEnum()">@tipo.DescricaoEnum()</option>
+                    }
+                </select>
+            </div>
+            <div class="col-8">
+                <div class="tipo-autorizacao-selecionada">
+                    <div class="alert alert-info">Nenhum tipo de autentização informado para integração.<br/>As requisições desta integração NÃO serão autenticadas por nenhum método.</div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary gravar-autorizacao">Gravar Authorization</button>
+            </div>
+        </div>
+    </form>
+</div>

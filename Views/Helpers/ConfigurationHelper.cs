@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
-
-namespace hubfast_frontend.Views.Helpers;
+﻿namespace hubfast_frontend.Views.Helpers;
 
 public static class ConfigurationHelper
 {

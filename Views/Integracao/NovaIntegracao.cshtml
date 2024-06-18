@@ -1,14 +1,12 @@
-﻿@using hubfast_frontend.Views.Helpers
-@using hubfast_frontend.Services.Helpers
-@using hubfast_frontend.Services.Models.Enums
-@model GravarIntegracaoViewModel;
+﻿@model NovaIntegracaoViewModel;
 @{
     ViewBag.Title = "Configurar Integração";
     Layout = "_Layout";
 }
 
 <div class="container">
-    <h3 class="mb-2">Configuração de Integração</h3>
+    <h3 class="mb-2">Configuração de Integração</h3>        
+    <hr/>
     <ul class="nav nav-tabs" id="tabsConfiguracao" role="tablist">
         <li class="nav-item">
             <a class="nav-link active" id="config-tab" data-bs-toggle="tab" href="#tab_integracao" role="tab" aria-controls="tab_integracao" aria-selected="true">Configuração</a>
@@ -19,7 +17,7 @@
     </ul>
     <div class="tab-content" id="tabsContent">
         <div class="tab-pane fade show active" id="tab_integracao" role="tabpanel" aria-labelledby="integration-tab">
-            <form id="from-integracao" asp-controller="Integracao" asp-action="Gravar">
+            <form id="from-integracao" asp-controller="Integracao" asp-action="RegistrarIntegracao">
                 <div class="row mt-3">
                     <div class="col-6">
                         <span class="d-inline-block">
@@ -46,6 +44,12 @@
                     <div class="col-6">
                         <label class="form-label">Opções de Integração</label>
                         <div class="form-check">
+                            <label class="form-check-label" for="opcaoAuthorization">
+                                <input class="form-check-input" type="checkbox" asp-for="OpcaoAuthorization" name="opcaoAuthorization" id="opcaoAuthorization"> Authorization
+                            </label>
+                            <div class="fs-6 fst-italic">Configurar autenticação de entrada da integração.</div>
+                        </div>
+                        <div class="form-check">
                             <label class="form-check-label" for="opcaoHealthcheck">
                                 <input class="form-check-input" type="checkbox" asp-for="OpcaoHealthcheck" id="opcaoHealthcheck"> Healthcheck
                             </label>
@@ -56,12 +60,6 @@
                                 <input class="form-check-input" type="checkbox" asp-for="OpcaoLogService" id="opcaoLogService"> Log Service
                             </label>
                             <div class="fs-6 fst-italic">Registrar os logs de transações da integração.</div>
-                        </div>
-                        <div class="form-check">
-                            <label class="form-check-label" for="opcaoAuthorization">
-                                <input class="form-check-input" type="checkbox" asp-for="OpcaoAuthorization" name="opcaoAuthorization" id="opcaoAuthorization"> Authorization
-                            </label>
-                            <div class="fs-6 fst-italic">Configurar autenticação de entrada da integração.</div>
                         </div>
                         <div class="form-check">
                             <label class="form-check-label" for="opcaoSwagger">

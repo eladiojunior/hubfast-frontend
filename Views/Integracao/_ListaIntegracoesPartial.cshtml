@@ -1,5 +1,4 @@
-﻿@using hubfast_frontend.Services.Helpers
-@model List<IntegracaoModel>
+﻿@model List<IntegracaoModel>
 @if (Model == null || Model.Count == 0)
 {
     <div class="alert alert-info">Nenhuma integração existente, clique em Nova Integração para iniciar.</div>
@@ -45,7 +44,7 @@ else
             </td>
             <td>@item.SituacaoIntegracao.DescricaoEnum()</td>
             <td class="text-center">
-                <a asp-action="CarregarEditar" asp-controller="Integracao" asp-route-idIntegracao="@item.IdIntegracao"><i class="icon ion-edit fs-5"></i></a>
+                <a href="Integracao\CarregarEdicaoIntegracao?idIntegracao=@item.IdIntegracao"><i class="icon ion-edit fs-5"></i></a>
                 <a href="#" data-id="@item.IdIntegracao" class="remover-integracao"><i class="icon ion-trash-a fs-5"></i></a>
             </td>
         </tr>

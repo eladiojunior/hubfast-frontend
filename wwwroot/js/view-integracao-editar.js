@@ -1,7 +1,6 @@
 ﻿EditarIntegracao = {
-
     InitConfiguracao: function () {
-        $("input[name='nomeIntegracao']").on('keyup', function (event) {
+        $("input[name='NomeIntegracao']").on('keyup', function (event) {
             let nome = $(this).val();
             if (nome === '') nome = '{nome_integracao}';
             $("label.nome-integracao").text(nome);
@@ -10,7 +9,9 @@
             var idIntegracao = $("#IdIntegracao").val();
             var nome_tab = $(this).data('tab');
             if ('tab_operacoes' === nome_tab) {
-                EditarIntegracao.CarregarOperacoes(idIntegracao);
+                OperacaoIntegracao.NovaOperacao(idIntegracao);
+            } else if ('tab_authorization' === nome_tab) {
+                AuthorizationIntegracao.ObterAuthorization();
             }
             event.preventDefault();
             $(this).tab('show');
@@ -21,27 +22,6 @@
                 event.stopPropagation();
             }
             $(this).addClass('was-validated');
-        });
-    },
-    CarregarOperacoes: function (idIntegracao) {
-        $.ajax({
-            cache: false,
-            type: "GET",
-            url: _contexto + "Integracao/ListarOperacoesIntegracao",
-            dataType: "json",
-            data: {
-                idIntegracao: idIntegracao
-            },
-            success: function (result) {
-                if (result.hasErro) {
-                    console.log(result.erros);
-                    return;
-                }
-                $("div.operacoes").html(result.model);
-                EditarOperacoes.InitConfiguracao();
-            }, error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.log(errorThrown);
-            }
         });
     },
 }

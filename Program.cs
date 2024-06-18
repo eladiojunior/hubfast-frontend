@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IIntegracaoService, IntegracaoService>();
+builder.Services.AddScoped<IOperacaoIntegracaoService, OperacaoIntegracaoService>();
 builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
 
 var app = builder.Build();

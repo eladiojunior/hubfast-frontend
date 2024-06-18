@@ -1,6 +1,6 @@
 ﻿namespace hubfast_frontend.Models;
 
-public class EdicaoIntegracaoViewModel
+public class EditarIntegracaoViewModel
 {
     public string IdIntegracao { get; set; }
     public string NomeIntegracao { get; set; }

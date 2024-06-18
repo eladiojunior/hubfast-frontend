@@ -1,22 +1,20 @@
 ﻿let editorJsonRequest = null;
 let editorJsonResponse = null;
-EditarOperacoes = {
+OperacaoIntegracao = {
     
     InitConfiguracao: function () {
-        EditarOperacoes.InitEditorJson();
-        EditarOperacoes.InitGravarOperacao();
+        OperacaoIntegracao.InitEditorJson();
+        OperacaoIntegracao.InitGravarOperacao();
         $(".nova-operacao").click(function () {
-            EditarOperacoes.NovaOperacao();
+            OperacaoIntegracao.NovaOperacao();
         });
-        EditarOperacoes.InitConfiguracaoListaOperacoes();
+        OperacaoIntegracao.ListarOperacoes();
     },
     
     InitEditorJson: function () {
-        
         const options = {
             mode: 'code',
         };
-
         const editorRequest = document.getElementById("jsoneditor_request");
         if (editorRequest) {
             editorJsonRequest = new JSONEditor(editorRequest, options);
@@ -34,7 +32,6 @@ EditarOperacoes = {
                 json_request = JSON.parse(json_request);
             editorJsonRequest.set(json_request);
         }
-        
         const editorResponse = document.getElementById("jsoneditor_response");
         if (editorResponse) {
             editorJsonResponse = new JSONEditor(editorResponse, options);
@@ -48,23 +45,37 @@ EditarOperacoes = {
     },
     
     InitGravarOperacao: function () {
-        $('#form-operacao').submit(function(event){
+        $('#form-operacao').submit(async function (event) {
             if (!this.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
                 return false;
             }
             $(this).addClass('was-validated');
+            //Verificar erros no JSONs
+            const errorsJsonRequest = await editorJsonRequest.validate();
+            if (errorsJsonRequest.length) {
+                Global.ExibirMensagem(errorsJsonRequest[0].mensage, true);
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            }
+            const errorsJsonResponse = await editorJsonResponse.validate();
+            if (errorsJsonResponse.length) {
+                Global.ExibirMensagem(errorsJsonResponse[0].mensage, true);
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            }
             //Carregar JSON nos inputs
             const jsonRequest = editorJsonRequest.get();
             const jsonResponse = editorJsonResponse.get();
             $("input[name='JsonRequestOperacao']").val(JSON.stringify(jsonRequest));
             $("input[name='JsonResponseOperacao']").val(JSON.stringify(jsonResponse));
-            const idIntegracao = $("#IdIntegracao").val();
             $.ajax({
                 cache: false,
                 type: "POST",
-                url: _contexto + "Integracao/GravarOperacao",
+                url: _contexto + "OperacaoIntegracao/GravarOperacao",
                 dataType: "json",
                 data: $(this).serialize(),
                 success: function (result) {
@@ -72,18 +83,40 @@ EditarOperacoes = {
                         Global.ExibirMensagem(result.erros, true);
                         return;
                     }
+                    const idIntegracao = result.model.idIntegracao;
+                    const idOperacao = result.model.idOperacao;
                     Global.ExibirMensagem(result.mensagem);
-                    EditarIntegracao.CarregarOperacoes(idIntegracao);
+                    OperacaoIntegracao.CarregarOperacao(idIntegracao, idOperacao);
                 }, error: function (XMLHttpRequest, textStatus, errorThrown) {
                     Global.ExibirMensagem(errorThrown, true);
                 }
             });
+            event.preventDefault();
+            event.stopPropagation();
             return false;
         });
     },
     NovaOperacao: function () {
         const idIntegracao = $("#IdIntegracao").val();
-        EditarIntegracao.CarregarOperacoes(idIntegracao);
+        $.ajax({
+            cache: false,
+            type: "GET",
+            url: _contexto + "OperacaoIntegracao/NovaOperacao",
+            dataType: "json",
+            data: {
+                idIntegracao: idIntegracao
+            },
+            success: function (result) {
+                if (result.hasErro) {
+                    Global.ExibirMensagem(result.erros, true);
+                    return;
+                }
+                $("div.operacoes").html(result.model);
+                OperacaoIntegracao.InitConfiguracao();
+            }, error: function (XMLHttpRequest, textStatus, errorThrown) {
+                Global.ExibirMensagem(errorThrown, true);
+            }
+        });
     },
     InitConfiguracaoListaOperacoes: function () {
         const json_view = document.getElementById("jsoneditor_view_modal");
@@ -99,19 +132,20 @@ EditarOperacoes = {
         $(".editar-operacao").click(function () {
             const idOperacao = $(this).data('id');
             const idIntegracao = $("#IdIntegracao").val(); 
-            EditarOperacoes.CarregarOperacao(idIntegracao, idOperacao);
+            OperacaoIntegracao.CarregarOperacao(idIntegracao, idOperacao);
         });
         $(".remover-operacao").click(function () {
             const idOperacao = $(this).data('id');
-            Global.ExibirConfirmacao("Remover Operação da Integração", "Confirma a remoção da operação ["+idOperacao+"] da integração.", 
-                EditarOperacoes.RemoverOperacao, null, "modalConfirmaRemocaoOperacao");
+            $("#IdOperacao").val(idOperacao);
+            Global.ExibirConfirmacao("Remover Operação da Integração", "Confirma a remoção da operação ["+idOperacao+"] da integração?", 
+                OperacaoIntegracao.RemoverOperacao, null, "modalConfirmaRemocaoOperacao");
         });
     },
     CarregarOperacao: function (idIntegracao, idOperacao) {
         $.ajax({
             cache: false,
             type: "GET",
-            url: _contexto + "Integracao/CarregarEdicaoOperacao",
+            url: _contexto + "OperacaoIntegracao/CarregarEdicaoOperacao",
             dataType: "json",
             data: {
                 idIntegracao: idIntegracao,
@@ -123,7 +157,7 @@ EditarOperacoes = {
                     return;
                 }
                 $("div.operacoes").html(result.model);
-                EditarOperacoes.InitConfiguracao();
+                OperacaoIntegracao.InitConfiguracao();
             }, error: function (XMLHttpRequest, textStatus, errorThrown) {
                 Global.ExibirMensagem(errorThrown, true);
             }
@@ -131,11 +165,10 @@ EditarOperacoes = {
     },
     RemoverOperacao: function () {
         const idOperacao = $("#IdOperacao").val();
-        const idIntegracao = $("#IdIntegracao").val();
         $.ajax({
             cache: false,
-            type: "POST",
-            url: _contexto + "Integracao/RemoverOperacao",
+            type: "DELETE",
+            url: _contexto + "OperacaoIntegracao/RemoverOperacao",
             dataType: "json",
             data: {
                 idOperacao: idOperacao
@@ -145,7 +178,29 @@ EditarOperacoes = {
                     Global.ExibirMensagem(result.erros, true);
                     return;
                 }
-                EditarIntegracao.CarregarOperacoes(idIntegracao);
+                OperacaoIntegracao.NovaOperacao();
+            }, error: function (XMLHttpRequest, textStatus, errorThrown) {
+                Global.ExibirMensagem(errorThrown, true);
+            }
+        });
+    },
+    ListarOperacoes: function () {
+        const idIntegracao = $("#IdIntegracao").val();
+        $.ajax({
+            cache: false,
+            type: "GET",
+            url: _contexto + "OperacaoIntegracao/ListarOperacao",
+            dataType: "json",
+            data: {
+                idIntegracao: idIntegracao
+            },
+            success: function (result) {
+                if (result.hasErro) {
+                    Global.ExibirMensagem(result.erros, true);
+                    return;
+                }
+                $("div.lista-operacoes").html(result.model);
+                OperacaoIntegracao.InitConfiguracaoListaOperacoes();
             }, error: function (XMLHttpRequest, textStatus, errorThrown) {
                 Global.ExibirMensagem(errorThrown, true);
             }
